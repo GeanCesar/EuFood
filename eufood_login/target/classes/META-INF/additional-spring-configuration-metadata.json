@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "sessao.usuario.tempo.expiracao.minutos",
+    "type": "java.lang.Integer",
+    "description": "Indica o tempo de expiração de sessão em minutos após a criação da mesma"
+  },
+  {
+    "name": "api.security.token.public.key",
+    "type": "java.lang.String",
+    "description": "A description for 'api.security.token.public.key'"
+  },
+  {
+    "name": "api.security.token.private.key",
+    "type": "java.lang.String",
+    "description": "A description for 'api.security.token.private.key'"
+  }
+]}
