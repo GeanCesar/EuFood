@@ -1,4 +1,4 @@
-package br.com.geancesar.eufood.restaurante.interceptor;
+package br.com.geancesar.eufood.cardapio.interceptor;
 
 public class CadastrarCategoriaItemInterceptor {
 

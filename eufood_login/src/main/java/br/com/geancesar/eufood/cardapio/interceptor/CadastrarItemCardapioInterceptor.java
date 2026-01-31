@@ -1,8 +1,9 @@
-package br.com.geancesar.eufood.restaurante.interceptor;
+package br.com.geancesar.eufood.cardapio.interceptor;
 
 import java.math.BigDecimal;
 
-import br.com.geancesar.eufood.restaurante.model.ItemCardapio;
+import br.com.geancesar.eufood.cardapio.model.ItemCardapio;
+import br.com.geancesar.eufood.cardapio.model.TipoItem;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 
 public class CadastrarItemCardapioInterceptor {
@@ -14,8 +15,6 @@ public class CadastrarItemCardapioInterceptor {
 	private BigDecimal valor;
 
 	private String descricao;
-
-	private int quantidadeMinimaSubItem;
 
 	public String getUuidRestaurante() {
 		return uuidRestaurante;
@@ -49,21 +48,12 @@ public class CadastrarItemCardapioInterceptor {
 		this.descricao = descricao;
 	}
 
-	public int getQuantidadeMinimaSubItem() {
-		return quantidadeMinimaSubItem;
-	}
-
-	public void setQuantidadeMinimaSubItem(int quantidadeMinimaSubItem) {
-		this.quantidadeMinimaSubItem = quantidadeMinimaSubItem;
-	}
-
-	public ItemCardapio cadastrar(RestauranteRepository restauranteRepository) {
-
+	public ItemCardapio cadastrar(RestauranteRepository restauranteRepository, TipoItem tipo) {
 		ItemCardapio item = new ItemCardapio();
 		item.setDescricao(descricao);
 		item.setNome(nome);
-		item.setQuantidadeMinimaSubItem(quantidadeMinimaSubItem);
 		item.setValor(valor);
+		item.setTipoItem(tipo);
 		item.setRestaurante(restauranteRepository.findById(uuidRestaurante).get());
 
 		return item;

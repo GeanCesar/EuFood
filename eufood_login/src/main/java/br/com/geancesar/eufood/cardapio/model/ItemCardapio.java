@@ -1,9 +1,10 @@
-package br.com.geancesar.eufood.restaurante.model;
+package br.com.geancesar.eufood.cardapio.model;
 
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,9 +34,9 @@ public class ItemCardapio {
 	@Column(name = "descricao", length = 1024)
 	private String descricao;
 
-	private int quantidadeMinimaSubItem;
-
 	private String imagem;
+
+	private TipoItem tipoItem;
 
 	@ManyToOne
 	private CategoriaItemCardapio categoria;
@@ -80,14 +81,6 @@ public class ItemCardapio {
 		this.descricao = descricao;
 	}
 
-	public int getQuantidadeMinimaSubItem() {
-		return quantidadeMinimaSubItem;
-	}
-
-	public void setQuantidadeMinimaSubItem(int quantidadeMinimaSubItem) {
-		this.quantidadeMinimaSubItem = quantidadeMinimaSubItem;
-	}
-
 	public String getImagem() {
 		return imagem;
 	}
@@ -102,6 +95,14 @@ public class ItemCardapio {
 
 	public void setCategoria(CategoriaItemCardapio categoria) {
 		this.categoria = categoria;
+	}
+
+	public TipoItem getTipoItem() {
+		return tipoItem;
+	}
+
+	public void setTipoItem(TipoItem tipoItem) {
+		this.tipoItem = tipoItem;
 	}
 
 }

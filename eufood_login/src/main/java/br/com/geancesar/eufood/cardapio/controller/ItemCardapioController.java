@@ -1,4 +1,4 @@
-package br.com.geancesar.eufood.restaurante.controller;
+package br.com.geancesar.eufood.cardapio.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,14 +24,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.geancesar.eufood.cardapio.interceptor.CadastrarItemCardapioInterceptor;
+import br.com.geancesar.eufood.cardapio.model.CategoriaItemCardapio;
+import br.com.geancesar.eufood.cardapio.model.ItemCardapio;
+import br.com.geancesar.eufood.cardapio.model.TipoItem;
+import br.com.geancesar.eufood.cardapio.repository.CategoriaItemRepository;
+import br.com.geancesar.eufood.cardapio.repository.ItemCardapioRepository;
 import br.com.geancesar.eufood.login.model.Usuario;
 import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
-import br.com.geancesar.eufood.restaurante.interceptor.CadastrarItemCardapioInterceptor;
-import br.com.geancesar.eufood.restaurante.model.CategoriaItemCardapio;
-import br.com.geancesar.eufood.restaurante.model.ItemCardapio;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
-import br.com.geancesar.eufood.restaurante.repository.CategoriaItemRepository;
-import br.com.geancesar.eufood.restaurante.repository.ItemCardapioRepository;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.security.TokenService;
 import br.com.geancesar.eufood.util.model.RespostaRequisicao;
@@ -101,7 +102,22 @@ public class ItemCardapioController {
 					HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
 		}
 
-		ItemCardapio item = itemInterceptor.cadastrar(restauranteRepository);
+		ItemCardapio item = itemInterceptor.cadastrar(restauranteRepository, TipoItem.ITEM);
+		repository.save(item);
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(new RespostaRequisicao(true, HttpStatus.CREATED.value(), item.getUuid()));
+	}
+	
+	@PostMapping("/sub_item/cadastrar")
+	public ResponseEntity<RespostaRequisicao> cadastrarSubItem(
+			@RequestBody CadastrarItemCardapioInterceptor itemInterceptor) {
+		if (!validaTokenRestaurante(itemInterceptor.getUuidRestaurante(), null, null)) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
+					HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
+		}
+
+		ItemCardapio item = itemInterceptor.cadastrar(restauranteRepository, TipoItem.SUBITEM);
 		repository.save(item);
 
 		return ResponseEntity.status(HttpStatus.CREATED)

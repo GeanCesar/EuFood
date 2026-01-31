@@ -1,4 +1,4 @@
-package br.com.geancesar.eufood.restaurante.controller;
+package br.com.geancesar.eufood.cardapio.controller;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import br.com.geancesar.eufood.cardapio.interceptor.CadastrarCategoriaItemInterceptor;
+import br.com.geancesar.eufood.cardapio.model.CategoriaItemCardapio;
+import br.com.geancesar.eufood.cardapio.repository.CategoriaItemRepository;
+import br.com.geancesar.eufood.cardapio.validator.CategoriaItemValidador;
 import br.com.geancesar.eufood.login.model.Usuario;
 import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
-import br.com.geancesar.eufood.restaurante.interceptor.CadastrarCategoriaItemInterceptor;
-import br.com.geancesar.eufood.restaurante.model.CategoriaItemCardapio;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
-import br.com.geancesar.eufood.restaurante.repository.CategoriaItemRepository;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
-import br.com.geancesar.eufood.restaurante.validator.CategoriaItemValidador;
 import br.com.geancesar.eufood.security.TokenService;
 import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import jakarta.servlet.http.HttpServletRequest;

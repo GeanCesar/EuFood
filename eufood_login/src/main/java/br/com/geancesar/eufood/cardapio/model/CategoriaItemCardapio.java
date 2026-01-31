@@ -1,7 +1,8 @@
-package br.com.geancesar.eufood.restaurante.model;
+package br.com.geancesar.eufood.cardapio.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -1,7 +1,7 @@
-package br.com.geancesar.eufood.restaurante.validator;
+package br.com.geancesar.eufood.cardapio.validator;
 
-import br.com.geancesar.eufood.restaurante.interceptor.CadastrarCategoriaItemInterceptor;
-import br.com.geancesar.eufood.restaurante.model.CategoriaItemCardapio;
+import br.com.geancesar.eufood.cardapio.interceptor.CadastrarCategoriaItemInterceptor;
+import br.com.geancesar.eufood.cardapio.model.CategoriaItemCardapio;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
 
 public class CategoriaItemValidador {
