@@ -25,6 +25,8 @@ public class CategoriaSubItem {
 	private int quantidadeMinima;
 
 	private int quantidadeMaxima;
+	
+	private int ordem;
 
 	public String getUuid() {
 		return uuid;
@@ -64,6 +66,14 @@ public class CategoriaSubItem {
 
 	public void setQuantidadeMaxima(int quantidadeMaxima) {
 		this.quantidadeMaxima = quantidadeMaxima;
+	}
+	
+	public void setOrdem(int ordem) {
+		this.ordem = ordem;
+	}
+	
+	public int getOrdem() {
+		return ordem;
 	}
 
 }

@@ -36,7 +36,7 @@ public class ItemCardapio {
 
 	private String imagem;
 
-	private TipoItem tipoItem;
+	private String tipoItem;
 
 	@ManyToOne
 	private CategoriaItemCardapio categoria;
@@ -98,11 +98,11 @@ public class ItemCardapio {
 	}
 
 	public TipoItem getTipoItem() {
-		return tipoItem;
+		return TipoItem.valueOf(tipoItem);
 	}
 
 	public void setTipoItem(TipoItem tipoItem) {
-		this.tipoItem = tipoItem;
+		this.tipoItem = tipoItem.getDescricao();
 	}
 
 }
