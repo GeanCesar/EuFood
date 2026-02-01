@@ -1,1 +1,2 @@
-target
+## ignoring target file
+target/
