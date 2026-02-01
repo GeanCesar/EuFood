@@ -68,7 +68,7 @@ public class ItemCardapioController {
 	@GetMapping("listar")
 	public ResponseEntity<RespostaRequisicao> listarItens(
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
-		List<ItemCardapio> items = repository.findAllByRestauranteUuid(uuidRestaurante);
+		List<ItemCardapio> items = repository.findAllByRestauranteUuidAndTipoItem(uuidRestaurante, TipoItem.ITEM.toString());
 
 		if (items != null && items.size() > 0) {
 			return ResponseEntity.status(HttpStatus.FOUND)
@@ -83,7 +83,7 @@ public class ItemCardapioController {
 	public ResponseEntity<RespostaRequisicao> listarItensPorCategoria(
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante,
 			@RequestParam(value = "uuid-categoria") String uuidCategoria) {
-		List<ItemCardapio> items = repository.findAllByRestauranteUuidAndCategoriaUuid(uuidRestaurante, uuidCategoria);
+		List<ItemCardapio> items = repository.findAllByRestauranteUuidAndCategoriaUuidAndTipoItem(uuidRestaurante, uuidCategoria, TipoItem.ITEM.toString());
 
 		if (items != null && items.size() > 0) {
 			return ResponseEntity.status(HttpStatus.FOUND)

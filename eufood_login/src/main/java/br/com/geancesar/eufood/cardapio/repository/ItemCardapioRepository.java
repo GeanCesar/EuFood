@@ -8,8 +8,8 @@ import br.com.geancesar.eufood.cardapio.model.ItemCardapio;
 
 public interface ItemCardapioRepository extends CrudRepository<ItemCardapio, String> {
 
-	public List<ItemCardapio> findAllByRestauranteUuid(String uuidRestaurante);
+	public List<ItemCardapio> findAllByRestauranteUuidAndTipoItem(String uuidRestaurante, String tipoItem);
 
-	public List<ItemCardapio> findAllByRestauranteUuidAndCategoriaUuid(String uuidRestaurante, String categoria);
+	public List<ItemCardapio> findAllByRestauranteUuidAndCategoriaUuidAndTipoItem(String uuidRestaurante, String categoria, String tipoItem);
 
 }
