@@ -1,7 +1,11 @@
 package br.com.geancesar.eufood.cardapio.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import br.com.geancesar.eufood.cardapio.interceptor.CadastrarCategoriaItemInterceptor;
 import br.com.geancesar.eufood.cardapio.model.CategoriaItemCardapio;
+import br.com.geancesar.eufood.cardapio.model.CategoriaSubItem;
+import br.com.geancesar.eufood.cardapio.model.CategoriaSubItemRest;
+import br.com.geancesar.eufood.cardapio.model.ItemSubItem;
 import br.com.geancesar.eufood.cardapio.repository.CategoriaItemRepository;
+import br.com.geancesar.eufood.cardapio.repository.ItemCardapioRepository;
+import br.com.geancesar.eufood.cardapio.repository.ItemSubItemRepository;
 import br.com.geancesar.eufood.cardapio.validator.CategoriaItemValidador;
 import br.com.geancesar.eufood.login.model.Usuario;
 import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
@@ -30,6 +39,9 @@ import jakarta.servlet.http.HttpServletRequest;
 public class CategoriaItemCardapioController {
 
 	@Autowired
+	ItemCardapioRepository itemCardapioRepository;
+
+	@Autowired
 	CategoriaItemRepository repository;
 
 	@Autowired
@@ -42,7 +54,17 @@ public class CategoriaItemCardapioController {
 	LoginUsuarioRepository usuarioRepository;
 
 	@Autowired
+	ItemSubItemRepository subItemRepository;
+
+	@Autowired
+	ItemCardapioRepository itemRepository;
+
+	@Autowired
 	private HttpServletRequest request;
+
+	CategoriaItemCardapioController(ItemCardapioRepository itemCardapioRepository) {
+		this.itemCardapioRepository = itemCardapioRepository;
+	}
 
 	@PostMapping(value = "/cadastrar")
 	public ResponseEntity<RespostaRequisicao> cadastrarCategoria(
@@ -77,9 +99,46 @@ public class CategoriaItemCardapioController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), null));
 		}
-		
+
 		return ResponseEntity.status(HttpStatus.FOUND)
 				.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), categorias));
+	}
+
+	@GetMapping(value = "listar/item")
+	public ResponseEntity<RespostaRequisicao> listarSubItens(
+			@RequestParam(value = "uuid-restaurante") String uuidRestaurante,
+			@RequestParam(value = "uuid-item") String uuidItem) {
+
+		List<ItemSubItem> subItems = subItemRepository.findAllByItemPrincipalUuid(uuidItem);
+
+		if (subItems == null || subItems.size() == 0) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), null));
+		}
+
+		List<CategoriaSubItemRest> categorias = processaSubItems(subItems);
+
+		return ResponseEntity.status(HttpStatus.FOUND)
+				.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), categorias));
+	}
+
+	private List<CategoriaSubItemRest> processaSubItems(List<ItemSubItem> subItems) {
+		List<CategoriaSubItemRest> categorias = new ArrayList<>();
+
+		Map<CategoriaSubItem, List<ItemSubItem>> categoriasComItens = subItems.stream()
+				.collect(Collectors.groupingBy(ItemSubItem::getCategoriaSubItem));
+
+		for (Entry<CategoriaSubItem, List<ItemSubItem>> categoria : categoriasComItens.entrySet()) {
+			for (ItemSubItem item : categoria.getValue()) {
+				CategoriaSubItemRest cat = new CategoriaSubItemRest();
+				cat.setDescricao(categoria.getKey().getDescricao());
+				cat.setQuantidadeMaxima(categoria.getKey().getQuantidadeMaxima());
+				cat.setQuantidadeMinima(categoria.getKey().getQuantidadeMinima());
+				cat.getItens().add(item.getSubItem());
+				categorias.add(cat);
+			}
+		}
+		return categorias;
 	}
 
 	private boolean validaTokenRestaurante(String uuidRestaurante) {
