@@ -35,7 +35,7 @@ public class CategoriaSubItemValidador {
 	public CategoriaSubItem getCategoria(CadastrarCategoriaSubItemInterceptor interceptor, Restaurante restaurante) {
 		CategoriaSubItem categoria = new CategoriaSubItem();
 		categoria.setQuantidadeMaxima(interceptor.getQuantidadeMaxima());
-		categoria.setQuantidadeMinima(categoria.getQuantidadeMinima());
+		categoria.setQuantidadeMinima(interceptor.getQuantidadeMinima());
 		categoria.setDescricao(interceptor.getDescricao());
 		categoria.setOrdem(interceptor.getOrdem());
 		categoria.setRestaurante(restaurante);

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.geancesar.eufood.cardapio.interceptor.CadastrarItemCardapioInterceptor;
@@ -186,9 +187,9 @@ public class ItemCardapioController {
 					.body(new RespostaRequisicao(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
 		}
 	}
-
-	@GetMapping(value = "/imagem_perfil")
-	public ResponseEntity<RespostaRequisicao> uploadImagemPerfil(
+	
+	@GetMapping(value = "/imagem_item")
+	public @ResponseBody byte[] getImagemItem(
 			@RequestParam(required = true, value = "uuid-item-cardapio") String uuidItemCardapio) {
 		Optional<ItemCardapio> item = repository.findById(uuidItemCardapio);
 		if (item.isPresent()) {
@@ -196,18 +197,16 @@ public class ItemCardapioController {
 				File imagem = new File(discoArquivos + CAMINHO_IMAGENS + item.get().getRestaurante().getUuid() + "\\"
 						+ item.get().getImagem());
 				InputStream stream = new FileInputStream(imagem);
-				return ResponseEntity.status(HttpStatus.OK)
-						.body(new RespostaRequisicao(true, HttpStatus.OK.value(), IOUtils.toByteArray(stream)));
+				
+				return IOUtils.toByteArray(stream);
 			} catch (Exception e) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), "Imagem não encontrada"));
+				return null;
 			}
 		}
 
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), "Item cardapio não encontrado"));
-
+		return null;
 	}
+
 
 	private boolean validaTokenRestaurante(String uuidRestaurante, String uuidItemCardapio, String uuidCategoria) {
 		String authHeader = request.getHeader("Authorization");

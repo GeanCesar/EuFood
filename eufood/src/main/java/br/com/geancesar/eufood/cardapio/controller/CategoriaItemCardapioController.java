@@ -134,8 +134,14 @@ public class CategoriaItemCardapioController {
 				cat.setDescricao(categoria.getKey().getDescricao());
 				cat.setQuantidadeMaxima(categoria.getKey().getQuantidadeMaxima());
 				cat.setQuantidadeMinima(categoria.getKey().getQuantidadeMinima());
-				cat.getItens().add(item.getSubItem());
-				categorias.add(cat);
+				cat.setUuid(categoria.getKey().getUuid());
+
+				if (categorias.contains(cat)) {
+					categorias.get(categorias.indexOf(cat)).getItens().add(item.getSubItem());
+				} else {
+					cat.getItens().add(item.getSubItem());
+					categorias.add(cat);
+				}
 			}
 		}
 		return categorias;
