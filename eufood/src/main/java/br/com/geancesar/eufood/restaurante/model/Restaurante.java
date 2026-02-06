@@ -1,5 +1,7 @@
 package br.com.geancesar.eufood.restaurante.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.geancesar.eufood.login.model.Usuario;
@@ -11,7 +13,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotEmpty;
 
 @Entity(name = "tb_restaurante")
-public class Restaurante {
+public class Restaurante implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
