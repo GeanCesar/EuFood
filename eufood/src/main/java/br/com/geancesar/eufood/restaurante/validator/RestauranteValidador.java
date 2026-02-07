@@ -1,6 +1,7 @@
 package br.com.geancesar.eufood.restaurante.validator;
 
 import br.com.geancesar.eufood.restaurante.interceptor.CadastrarRestauranteInterceptor;
+import br.com.geancesar.eufood.util.model.RespostaValidacao;
 
 public class RestauranteValidador {
 
@@ -9,19 +10,22 @@ public class RestauranteValidador {
 	private RestauranteValidador() {
 	}
 
-	public String validarDadosCadastro(CadastrarRestauranteInterceptor restaurante) {
+	public RespostaValidacao validarDadosCadastro(CadastrarRestauranteInterceptor restaurante) {
 
-		String mensagem = null;
+		String mensagem = "";
+		boolean ok = true;
 
-		if (restaurante == null) {
+		if (ok && (restaurante == null)) {
 			mensagem = "Campos do restaurante vazios";
+			ok = false;
 		}
 
-		if (restaurante.getNome() == null || restaurante.getNome().isEmpty()) {
+		if (ok && (restaurante.getNome() == null || restaurante.getNome().isEmpty())) {
 			mensagem = "Nome do restaurante precisa ser preenchido";
+			ok = false;
 		}
 
-		return mensagem;
+		return new RespostaValidacao(mensagem, ok);
 	}
 
 	public static RestauranteValidador getInstance() {

@@ -7,9 +7,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity(name = "tb_pedido_status")
-public class StatusPedido implements Serializable{
+public class PedidoStatus implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 
@@ -20,6 +22,10 @@ public class StatusPedido implements Serializable{
 	private Date dataHora;
 
 	private String status;
+	
+	@ManyToOne
+	@JoinColumn(name = "uuid_pedido", nullable = false)
+	private Pedido pedido;
 
 	public String getUuid() {
 		return uuid;
@@ -43,6 +49,14 @@ public class StatusPedido implements Serializable{
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	public Pedido getPedido() {
+		return pedido;
+	}
+	
+	public void setPedido(Pedido pedido) {
+		this.pedido = pedido;
 	}
 
 }

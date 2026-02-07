@@ -15,6 +15,7 @@ import br.com.geancesar.eufood.login.model.UsuarioRole;
 import br.com.geancesar.eufood.login.repository.CadastrarUsuarioRepository;
 import br.com.geancesar.eufood.login.validator.CadastrarUsuarioValidator;
 import br.com.geancesar.eufood.util.model.RespostaRequisicao;
+import br.com.geancesar.eufood.util.model.RespostaValidacao;
 
 @Controller
 @RequestMapping("usuario")
@@ -31,8 +32,9 @@ public class CadastrarUsuarioController {
 	 * @return
 	 */
 	public ResponseEntity<RespostaRequisicao> cadastrar(@RequestBody UsuarioInterceptor usuarioInterceptor) {
-		String ok = CadastrarUsuarioValidator.getInstance().validarCadastrarUsuario(usuarioInterceptor, repository);
-		if (ok.isEmpty()) {
+		RespostaValidacao respostaValidacao = CadastrarUsuarioValidator.getInstance()
+				.validarCadastrarUsuario(usuarioInterceptor, repository);
+		if (respostaValidacao.isOk()) {
 			Usuario usuario = CadastrarUsuarioInterceptor.getInstance().cadastrar(usuarioInterceptor);
 			usuario.setRole(UsuarioRole.USUARIO.getRole());
 
@@ -42,7 +44,7 @@ public class CadastrarUsuarioController {
 		}
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), ok));
+				.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), respostaValidacao.getMensagem()));
 	}
 
 	@PostMapping("/cadastrar_usuario_restaurante")
@@ -55,8 +57,9 @@ public class CadastrarUsuarioController {
 	 */
 	public ResponseEntity<RespostaRequisicao> cadastrarUsuarioRestaurante(
 			@RequestBody UsuarioInterceptor usuarioInterceptor) {
-		String ok = CadastrarUsuarioValidator.getInstance().validarCadastrarUsuario(usuarioInterceptor, repository);
-		if (ok.isEmpty()) {
+		RespostaValidacao respostaValidacao = CadastrarUsuarioValidator.getInstance()
+				.validarCadastrarUsuario(usuarioInterceptor, repository);
+		if (respostaValidacao.isOk()) {
 			Usuario usuario = CadastrarUsuarioInterceptor.getInstance().cadastrar(usuarioInterceptor);
 			usuario.setRole(UsuarioRole.RESTAURANTE.getRole());
 
@@ -66,7 +69,7 @@ public class CadastrarUsuarioController {
 		}
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), ok));
+				.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), respostaValidacao.getMensagem()));
 	}
 
 	@PostMapping("/cadastrar/consultar_telefone")

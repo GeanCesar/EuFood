@@ -3,6 +3,7 @@ package br.com.geancesar.eufood.cardapio.validator;
 import br.com.geancesar.eufood.cardapio.interceptor.CadastrarCategoriaItemInterceptor;
 import br.com.geancesar.eufood.cardapio.model.CategoriaItemCardapio;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
+import br.com.geancesar.eufood.util.model.RespostaValidacao;
 
 public class CategoriaItemValidador {
 
@@ -18,14 +19,16 @@ public class CategoriaItemValidador {
 		return instance;
 	}
 
-	public String validaDadosCadastro(CadastrarCategoriaItemInterceptor interceptor) {
+	public RespostaValidacao validaDadosCadastro(CadastrarCategoriaItemInterceptor interceptor) {
 		String mensagem = null;
+		boolean ok = true;
 
-		if (interceptor.getDescricao() == null || interceptor.getDescricao().length() <= 0) {
+		if (ok && (interceptor.getDescricao() == null || interceptor.getDescricao().length() <= 0)) {
 			mensagem = "Descrição da categoria precisa ser preenchida";
+			ok = false;
 		}
 
-		return mensagem;
+		return new RespostaValidacao(mensagem, ok);
 	}
 
 	public CategoriaItemCardapio getCategoria(CadastrarCategoriaItemInterceptor interceptor, Restaurante restaurante) {

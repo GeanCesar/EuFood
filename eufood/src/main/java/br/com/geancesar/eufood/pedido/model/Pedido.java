@@ -6,10 +6,13 @@ import java.util.List;
 
 import br.com.geancesar.eufood.login.model.Usuario;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 @Entity(name = "tb_pedido")
@@ -18,19 +21,21 @@ public class Pedido {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String uuid;
-	@OneToMany(mappedBy = "pedido")
+
+	@OneToMany(cascade = CascadeType.MERGE, mappedBy = "pedido")
 	private List<PedidoItem> items;
 
 	private BigDecimal valorTotal;
 
 	private Date dataHora;
 
-	private StatusPedido statusAtual;
-
+	@ManyToOne
+	@JoinColumn(name = "uuid_usuario", nullable = false)
 	private Usuario usuario;
 
+	@ManyToOne
+	@JoinColumn(name = "uuid_restaurante", nullable = false)
 	private Restaurante restaurante;
-
 
 	public String getUuid() {
 		return uuid;
@@ -79,13 +84,4 @@ public class Pedido {
 	public void setDataHora(Date dataHora) {
 		this.dataHora = dataHora;
 	}
-
-	public StatusPedido getStatusAtual() {
-		return statusAtual;
-	}
-
-	public void setStatusAtual(StatusPedido statusAtual) {
-		this.statusAtual = statusAtual;
-	}
-
 }

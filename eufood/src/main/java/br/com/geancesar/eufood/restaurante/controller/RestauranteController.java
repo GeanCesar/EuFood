@@ -31,6 +31,7 @@ import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.restaurante.validator.RestauranteValidador;
 import br.com.geancesar.eufood.security.TokenService;
 import br.com.geancesar.eufood.util.model.RespostaRequisicao;
+import br.com.geancesar.eufood.util.model.RespostaValidacao;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
@@ -64,11 +65,11 @@ public class RestauranteController {
 	public ResponseEntity<RespostaRequisicao> cadastrarRestaurante(
 			@RequestBody CadastrarRestauranteInterceptor interceptor) {
 
-		String validador = RestauranteValidador.getInstance().validarDadosCadastro(interceptor);
+		RespostaValidacao respotaValidacao = RestauranteValidador.getInstance().validarDadosCadastro(interceptor);
 
-		if (validador != null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), validador));
+		if (!respotaValidacao.isOk()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+					new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), respotaValidacao.getMensagem()));
 		}
 
 		Restaurante restaurante = interceptor.cadastrar();

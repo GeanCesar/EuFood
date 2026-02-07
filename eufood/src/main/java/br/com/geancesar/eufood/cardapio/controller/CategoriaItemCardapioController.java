@@ -32,6 +32,7 @@ import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.security.TokenService;
 import br.com.geancesar.eufood.util.model.RespostaRequisicao;
+import br.com.geancesar.eufood.util.model.RespostaValidacao;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
@@ -69,10 +70,10 @@ public class CategoriaItemCardapioController {
 	@PostMapping(value = "/cadastrar")
 	public ResponseEntity<RespostaRequisicao> cadastrarCategoria(
 			@RequestBody CadastrarCategoriaItemInterceptor interceptor) {
-		String mensagem = CategoriaItemValidador.getInstance().validaDadosCadastro(interceptor);
-		if (mensagem != null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), mensagem));
+		RespostaValidacao respostaValidacao = CategoriaItemValidador.getInstance().validaDadosCadastro(interceptor);
+		if (!respostaValidacao.isOk()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+					new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), respostaValidacao.getMensagem()));
 		}
 
 		if (!validaTokenRestaurante(interceptor.getUuidRestaurante())) {

@@ -37,7 +37,8 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.POST, "/restaurante/upload/imagem_perfil").hasAnyAuthority(UsuarioRole.ADMIN.getRole(), UsuarioRole.RESTAURANTE.getRole())
 						.requestMatchers(HttpMethod.POST, "/restaurante/upload/imagem_capa").hasAnyAuthority(UsuarioRole.ADMIN.getRole(), UsuarioRole.RESTAURANTE.getRole())
 						.requestMatchers(HttpMethod.POST, "/restaurante/item_cardapio/cadastrar").hasAnyAuthority(UsuarioRole.ADMIN.getRole(), UsuarioRole.RESTAURANTE.getRole())
-						.requestMatchers(HttpMethod.POST, "/restaurante/item_cardapio/upload/imagem_perfil").hasAnyAuthority(UsuarioRole.ADMIN.getRole(), UsuarioRole.RESTAURANTE.getRole())						
+						.requestMatchers(HttpMethod.POST, "/restaurante/item_cardapio/upload/imagem_perfil").hasAnyAuthority(UsuarioRole.ADMIN.getRole(), UsuarioRole.RESTAURANTE.getRole())
+						.requestMatchers(HttpMethod.POST, "/pedido").hasAnyAuthority(UsuarioRole.USUARIO.getRole())
 						.anyRequest().authenticated())
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}

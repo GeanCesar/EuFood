@@ -1,7 +1,9 @@
 package br.com.geancesar.eufood.pedido.model;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,18 +11,24 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity(name = "tb_pedido_item")
 public class PedidoItem {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(insertable=false, updatable=false)
+	@Column(insertable = false, updatable = false)
 	private String uuid;
+
+	private String uuidItem;
 
 	@ManyToOne
 	@JoinColumn(name = "uuid_pedido", nullable = false)
 	private Pedido pedido;
+
+	@OneToMany(cascade = CascadeType.MERGE, mappedBy = "itemPrincipal")
+	private List<PedidoSubItem> subItems;
 
 	private BigDecimal preco;
 	private BigDecimal quantidade;
@@ -30,11 +38,11 @@ public class PedidoItem {
 	public String getUuid() {
 		return uuid;
 	}
-	
+
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
-	
+
 	public Pedido getPedido() {
 		return pedido;
 	}
@@ -73,6 +81,22 @@ public class PedidoItem {
 
 	public void setValorTotal(BigDecimal valorTotal) {
 		this.valorTotal = valorTotal;
+	}
+
+	public String getUuidItem() {
+		return uuidItem;
+	}
+
+	public void setUuidItem(String uuidItem) {
+		this.uuidItem = uuidItem;
+	}
+
+	public List<PedidoSubItem> getSubItems() {
+		return subItems;
+	}
+
+	public void setSubItems(List<PedidoSubItem> subItems) {
+		this.subItems = subItems;
 	}
 
 }
