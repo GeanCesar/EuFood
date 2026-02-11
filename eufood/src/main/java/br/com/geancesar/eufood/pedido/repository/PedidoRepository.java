@@ -8,6 +8,6 @@ import br.com.geancesar.eufood.pedido.model.Pedido;
 
 public interface PedidoRepository extends CrudRepository<Pedido, String> {
 	
-	List<Pedido> findAllByUsuarioUuid(String uuid);
+	List<Pedido> findAllByUsuarioUuidOrderByDataHoraDesc(String uuid);
 
 }

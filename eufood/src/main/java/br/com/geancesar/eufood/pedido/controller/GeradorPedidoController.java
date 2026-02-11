@@ -23,6 +23,7 @@ import br.com.geancesar.eufood.pedido.repository.PedidoStatusRepository;
 import br.com.geancesar.eufood.pedido.repository.PedidoSubItemRepository;
 import br.com.geancesar.eufood.pedido.validator.PedidoValidador;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
+import br.com.geancesar.eufood.security.TokenService;
 import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import br.com.geancesar.eufood.util.model.RespostaValidacao;
 
@@ -56,6 +57,9 @@ public class GeradorPedidoController {
 
 	@Autowired
 	ItemSubItemRepository itemSubRepository;
+	
+	@Autowired
+	TokenService tokenService;
 
 	@PostMapping("/criar")
 	public ResponseEntity<RespostaRequisicao> criarPedido(@RequestBody CriacaoPedidoRest pedidoRest) {
@@ -67,7 +71,7 @@ public class GeradorPedidoController {
 		}
 
 		Pedido pedido = pedidoRest.toPedido(restauranteRepository, usuarioRepository, itemCardapioRepository,
-				itemSubRepository);
+				itemSubRepository, tokenService);
 		salvaPedido(pedido);
 
 		return ResponseEntity.status(HttpStatus.CREATED)

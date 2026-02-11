@@ -17,22 +17,13 @@ import br.com.geancesar.eufood.pedido.model.PedidoItem;
 import br.com.geancesar.eufood.pedido.model.PedidoSubItem;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
+import br.com.geancesar.eufood.security.TokenService;
 
 public class CriacaoPedidoRest {
 
 	private List<CriacaoPedidoItemRest> items;
 
 	private String uuidRestaurante;
-
-	private String uuidUsuario;
-
-	public String getUuidUsuario() {
-		return uuidUsuario;
-	}
-
-	public void setUuidUsuario(String uuidUsuario) {
-		this.uuidUsuario = uuidUsuario;
-	}
 
 	public void setUuidRestaurante(String uuidRestaurante) {
 		this.uuidRestaurante = uuidRestaurante;
@@ -51,8 +42,8 @@ public class CriacaoPedidoRest {
 	}
 
 	public Pedido toPedido(RestauranteRepository restauranteRepository, LoginUsuarioRepository usuarioRepository,
-			ItemCardapioRepository itemRepository, ItemSubItemRepository itemSubRepository) {
-		Optional<Usuario> usuario = usuarioRepository.findById(getUuidUsuario());
+			ItemCardapioRepository itemRepository, ItemSubItemRepository itemSubRepository, TokenService tokenService) {
+		Optional<Usuario> usuario = usuarioRepository.findById(tokenService.getUuidUsuario());
 		Optional<Restaurante> restaurante = restauranteRepository.findById(getUuidRestaurante());
 
 		Pedido pedido = new Pedido();

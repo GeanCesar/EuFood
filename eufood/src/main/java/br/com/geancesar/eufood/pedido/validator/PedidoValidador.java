@@ -11,29 +11,16 @@ import br.com.geancesar.eufood.cardapio.model.ItemCardapio;
 import br.com.geancesar.eufood.cardapio.model.ItemSubItem;
 import br.com.geancesar.eufood.cardapio.repository.ItemCardapioRepository;
 import br.com.geancesar.eufood.cardapio.repository.ItemSubItemRepository;
-import br.com.geancesar.eufood.login.model.Usuario;
-import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
 import br.com.geancesar.eufood.pedido.model.rest.criacao.CriacaoPedidoItemRest;
 import br.com.geancesar.eufood.pedido.model.rest.criacao.CriacaoPedidoRest;
 import br.com.geancesar.eufood.pedido.model.rest.criacao.CriacaoPedidoSubItemRest;
-import br.com.geancesar.eufood.security.TokenService;
 import br.com.geancesar.eufood.util.model.RespostaValidacao;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class PedidoValidador {
 
 	@Autowired
 	ItemCardapioRepository itemRepository;
-
-	@Autowired
-	private HttpServletRequest request;
-
-	@Autowired
-	private TokenService tokenService;
-
-	@Autowired
-	private LoginUsuarioRepository usuarioRepository;
 
 	@Autowired
 	private ItemSubItemRepository itemSubRepository;
@@ -71,11 +58,6 @@ public class PedidoValidador {
 			}
 		}
 
-		if (ok && (pedido.getUuidUsuario() == null)) {
-			mensagem = "É necessário informar um usuário";
-			ok = false;
-		}
-
 		if (ok && (pedido.getUuidRestaurante() == null)) {
 			mensagem = "É necessário informar um restaurante";
 			ok = false;
@@ -109,28 +91,7 @@ public class PedidoValidador {
 			}
 		}
 
-		if (ok && !validaToken(pedido.getUuidUsuario())) {
-			mensagem = "Token informado não condiz com o usuário informado no pedido";
-			ok = false;
-		}
-
 		return new RespostaValidacao(mensagem, ok);
-	}
-
-	private boolean validaToken(String uuid) {
-		String authHeader = request.getHeader("Authorization");
-		if (authHeader == null) {
-			return false;
-		}
-		String token = authHeader.replace("Bearer ", "");
-
-		String login = tokenService.validateToken(token);
-		Optional<Usuario> usuario = usuarioRepository.findByTelefone(login);
-
-		if (usuario.isPresent() && usuario.get().getUuid().equalsIgnoreCase(uuid)) {
-			return true;
-		}
-		return false;
 	}
 
 }

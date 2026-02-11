@@ -87,15 +87,15 @@ public class CadastrarUsuarioController {
 					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), "Telefone obrigatório"));
 		}
 		usuarioInterceptor.setTelefone(usuarioInterceptor.getTelefone().replace(" ", "").replace("-", ""));
-		
+
 		Optional<Usuario> usuario = repository.findByTelefone(usuarioInterceptor.getTelefone());
-		
+
 		if (!usuario.isPresent()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value()));
 		}
 
-		return ResponseEntity.status(HttpStatus.FOUND).body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), usuario.get().getUuid()));
+		return ResponseEntity.status(HttpStatus.FOUND).body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), ""));
 	}
 
 }

@@ -80,6 +80,20 @@ public class RestauranteController {
 				.body(new RespostaRequisicao(true, HttpStatus.CREATED.value(), restaurante.getUuid()));
 	}
 
+	@GetMapping(value = "/consultar")
+	public ResponseEntity<RespostaRequisicao> getRestaurante(
+			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
+		Optional<Restaurante> restaurante = repository.findById(uuidRestaurante);
+
+		if (!restaurante.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), ""));
+		}
+
+		return ResponseEntity.status(HttpStatus.FOUND)
+				.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), restaurante.get()));
+	}
+
 	@GetMapping(value = "/listar")
 	public ResponseEntity<RespostaRequisicao> getRestaurantes() {
 		Iterable<Restaurante> restaurantes = repository.findAll();
