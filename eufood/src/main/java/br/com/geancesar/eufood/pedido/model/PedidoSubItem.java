@@ -2,6 +2,8 @@ package br.com.geancesar.eufood.pedido.model;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,6 +28,7 @@ public class PedidoSubItem {
 
 	@ManyToOne
 	@JoinColumn(name = "uuid_item_principal", nullable = false)
+	@JsonIgnore
 	private PedidoItem itemPrincipal;
 
 	public String getUuid() {

@@ -3,6 +3,8 @@ package br.com.geancesar.eufood.pedido.model;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +27,7 @@ public class PedidoItem {
 
 	@ManyToOne
 	@JoinColumn(name = "uuid_pedido", nullable = false)
+	@JsonIgnore
 	private Pedido pedido;
 
 	@OneToMany(cascade = CascadeType.MERGE, mappedBy = "itemPrincipal")

@@ -1,5 +1,7 @@
 package br.com.geancesar.eufood.login.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,12 +87,15 @@ public class CadastrarUsuarioController {
 					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), "Telefone obrigatório"));
 		}
 		usuarioInterceptor.setTelefone(usuarioInterceptor.getTelefone().replace(" ", "").replace("-", ""));
-		if (!repository.findByTelefone(usuarioInterceptor.getTelefone()).isPresent()) {
+		
+		Optional<Usuario> usuario = repository.findByTelefone(usuarioInterceptor.getTelefone());
+		
+		if (!usuario.isPresent()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value()));
 		}
 
-		return ResponseEntity.status(HttpStatus.FOUND).body(new RespostaRequisicao(false, HttpStatus.FOUND.value()));
+		return ResponseEntity.status(HttpStatus.FOUND).body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), usuario.get().getUuid()));
 	}
 
 }

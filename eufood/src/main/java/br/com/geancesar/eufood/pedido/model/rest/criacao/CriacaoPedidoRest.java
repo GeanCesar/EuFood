@@ -63,13 +63,16 @@ public class CriacaoPedidoRest {
 
 		BigDecimal valorTotal = BigDecimal.ZERO;
 		for (CriacaoPedidoItemRest itemRest : items) {
+			BigDecimal valorTotalItem = BigDecimal.ZERO;
+
 			PedidoItem item = new PedidoItem();
 			item.setQuantidade(itemRest.getQuantidade());
 			item.setUuidItem(itemRest.getUuid());
 
 			Optional<ItemCardapio> itemCardapio = itemRepository.findById(itemRest.getUuid());
 			item.setPreco(itemCardapio.get().getValor());
-			item.setValorTotal(itemCardapio.get().getValor().multiply(itemRest.getQuantidade()));
+
+			valorTotalItem = itemCardapio.get().getValor().multiply(itemRest.getQuantidade());
 			item.setPedido(pedido);
 			item.setDesconto(BigDecimal.ZERO);
 
@@ -86,16 +89,19 @@ public class CriacaoPedidoRest {
 					sub.setPreco(s.get(0).getSubItem().getValor());
 					sub.setValorTotal(s.get(0).getSubItem().getValor().multiply(sub.getQuantidade()));
 
-					valorTotal = valorTotal.add(sub.getValorTotal());
+					valorTotalItem = valorTotalItem.add(sub.getValorTotal().multiply(item.getQuantidade()));
 					item.getSubItems().add(sub);
 				}
 			}
 
+			item.setValorTotal(valorTotalItem);
 			valorTotal = valorTotal.add(item.getValorTotal());
 			pedido.getItems().add(item);
 		}
 
-		pedido.setValorTotal(valorTotal);
+		// TODO Tornar o frete dinamico
+		pedido.setValorFrete(BigDecimal.valueOf(4.99));
+		pedido.setValorTotal(valorTotal.add(pedido.getValorFrete()));
 
 		return pedido;
 	}

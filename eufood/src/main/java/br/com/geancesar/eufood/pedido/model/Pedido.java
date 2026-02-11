@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.geancesar.eufood.login.model.Usuario;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import jakarta.persistence.CascadeType;
@@ -26,11 +28,14 @@ public class Pedido {
 	private List<PedidoItem> items;
 
 	private BigDecimal valorTotal;
+	
+	private BigDecimal valorFrete;
 
 	private Date dataHora;
 
 	@ManyToOne
 	@JoinColumn(name = "uuid_usuario", nullable = false)
+	@JsonIgnore
 	private Usuario usuario;
 
 	@ManyToOne
@@ -59,6 +64,14 @@ public class Pedido {
 
 	public void setRestaurante(Restaurante restaurante) {
 		this.restaurante = restaurante;
+	}
+	
+	public void setValorFrete(BigDecimal valorFrete) {
+		this.valorFrete = valorFrete;
+	}
+	
+	public BigDecimal getValorFrete() {
+		return valorFrete;
 	}
 
 	public List<PedidoItem> getItems() {
