@@ -193,14 +193,23 @@ public class ItemCardapioController {
 			@RequestParam(required = true, value = "uuid-item-cardapio") String uuidItemCardapio) {
 		Optional<ItemCardapio> item = repository.findById(uuidItemCardapio);
 		if (item.isPresent()) {
+			InputStream stream = null;
 			try {
 				File imagem = new File(discoArquivos + CAMINHO_IMAGENS + item.get().getRestaurante().getUuid() + "\\"
 						+ item.get().getImagem());
-				InputStream stream = new FileInputStream(imagem);
+				stream = new FileInputStream(imagem);
 				
 				return IOUtils.toByteArray(stream);
 			} catch (Exception e) {
 				return null;
+			} finally {
+				if(stream != null) {
+					try {
+						stream.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 
