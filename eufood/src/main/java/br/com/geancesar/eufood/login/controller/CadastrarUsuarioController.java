@@ -95,7 +95,7 @@ public class CadastrarUsuarioController {
 					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value()));
 		}
 
-		return ResponseEntity.status(HttpStatus.FOUND).body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), ""));
+		return ResponseEntity.status(HttpStatus.OK).body(new RespostaRequisicao(true, HttpStatus.OK.value(), ""));
 	}
 
 }

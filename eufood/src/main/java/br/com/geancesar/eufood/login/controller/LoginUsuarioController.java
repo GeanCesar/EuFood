@@ -1,6 +1,7 @@
 package br.com.geancesar.eufood.login.controller;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +61,25 @@ public class LoginUsuarioController {
 
 			return ResponseEntity.status(HttpStatus.OK)
 					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), token));
+		} else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(new RespostaRequisicao(false, HttpStatus.UNAUTHORIZED.value()));
+		}
+	}
+	
+	@GetMapping("/login/valida_token")
+	/**
+	 * Valida se o token informado é valido e retorna o usuário
+	 * 
+	 * @param usuarioInterceptor
+	 * @return
+	 */
+	public ResponseEntity<RespostaRequisicao> validaToken() {
+		Optional<Usuario> usuario = tokenService.getUsuario();		
+		
+		if (usuario != null && !usuario.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), usuario.get().getNome()));
 		} else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body(new RespostaRequisicao(false, HttpStatus.UNAUTHORIZED.value()));

@@ -82,8 +82,8 @@ public class SubItemCardapioController {
 		List<ItemCardapio> items = itemRepository.findAllByRestauranteUuidAndTipoItem(uuidRestaurante, TipoItem.SUBITEM.toString());
 
 		if (items != null && items.size() > 0) {
-			return ResponseEntity.status(HttpStatus.FOUND)
-					.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), items));
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), items));
 		}
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)

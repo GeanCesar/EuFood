@@ -41,8 +41,8 @@ public class PedidoController {
 		List<ConsultaPedidoRest> pedidos = buscaPedidos(uuidUsuario);
 
 		if (pedidos != null && pedidos.size() > 0) {
-			return ResponseEntity.status(HttpStatus.FOUND)
-					.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), pedidos));
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), pedidos));
 		}
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)

@@ -101,8 +101,8 @@ public class CategoriaItemCardapioController {
 					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), null));
 		}
 
-		return ResponseEntity.status(HttpStatus.FOUND)
-				.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), categorias));
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), categorias));
 	}
 
 	@GetMapping(value = "listar/item")
@@ -119,8 +119,8 @@ public class CategoriaItemCardapioController {
 
 		List<CategoriaSubItemRest> categorias = processaSubItems(subItems);
 
-		return ResponseEntity.status(HttpStatus.FOUND)
-				.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), categorias));
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), categorias));
 	}
 
 	private List<CategoriaSubItemRest> processaSubItems(List<ItemSubItem> subItems) {

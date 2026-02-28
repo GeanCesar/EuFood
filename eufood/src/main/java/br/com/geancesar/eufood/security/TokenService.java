@@ -72,5 +72,18 @@ public class TokenService {
 
 		return usuario.get().getUuid();
 	}
+	
+	public Optional<Usuario> getUsuario() {
+		String authHeader = request.getHeader("Authorization");
+		if (authHeader == null) {
+			return Optional.empty();
+		}
+		String token = authHeader.replace("Bearer ", "");
+
+		String login = validateToken(token);
+		Optional<Usuario> usuario = usuarioRepository.findByTelefone(login);
+
+		return usuario;
+	}
 
 }

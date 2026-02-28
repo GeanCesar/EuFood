@@ -72,8 +72,8 @@ public class ItemCardapioController {
 		List<ItemCardapio> items = repository.findAllByRestauranteUuidAndTipoItem(uuidRestaurante, TipoItem.ITEM.toString());
 
 		if (items != null && items.size() > 0) {
-			return ResponseEntity.status(HttpStatus.FOUND)
-					.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), items));
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), items));
 		}
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -87,8 +87,8 @@ public class ItemCardapioController {
 		List<ItemCardapio> items = repository.findAllByRestauranteUuidAndCategoriaUuidAndTipoItem(uuidRestaurante, uuidCategoria, TipoItem.ITEM.toString());
 
 		if (items != null && items.size() > 0) {
-			return ResponseEntity.status(HttpStatus.FOUND)
-					.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), items));
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), items));
 		}
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)

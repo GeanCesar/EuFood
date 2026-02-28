@@ -90,15 +90,22 @@ public class RestauranteController {
 					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), ""));
 		}
 
-		return ResponseEntity.status(HttpStatus.FOUND)
-				.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), restaurante.get()));
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), restaurante.get()));
 	}
 
 	@GetMapping(value = "/listar")
 	public ResponseEntity<RespostaRequisicao> getRestaurantes() {
 		Iterable<Restaurante> restaurantes = repository.findAll();
-		return ResponseEntity.status(HttpStatus.FOUND)
-				.body(new RespostaRequisicao(true, HttpStatus.FOUND.value(), restaurantes));
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), restaurantes));
+	}
+
+	@GetMapping(value = "/listar/usuario")
+	public ResponseEntity<RespostaRequisicao> getRestaurantesPorUsuario() {
+		Iterable<Restaurante> restaurantes = repository.findAllByUsuarioUuid(getUsuarioToken().getUuid());
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), restaurantes));
 	}
 
 	@GetMapping(value = "/imagem_perfil")

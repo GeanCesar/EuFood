@@ -13,5 +13,10 @@
     "name": "api.security.token.private.key",
     "type": "java.lang.String",
     "description": "A description for 'api.security.token.private.key'"
+  },
+  {
+    "name": "caminho.disco.imagens",
+    "type": "java.lang.String",
+    "description": "A description for 'caminho.disco.imagens'"
   }
 ]}
