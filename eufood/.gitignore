@@ -1,2 +1,3 @@
 ## ignoring target file
 target/
+bin/
