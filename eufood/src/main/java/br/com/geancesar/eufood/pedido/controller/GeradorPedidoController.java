@@ -3,10 +3,10 @@ package br.com.geancesar.eufood.pedido.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import br.com.geancesar.eufood.cardapio.repository.ItemCardapioRepository;
 import br.com.geancesar.eufood.cardapio.repository.ItemSubItemRepository;
@@ -27,7 +27,7 @@ import br.com.geancesar.eufood.security.TokenService;
 import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import br.com.geancesar.eufood.util.model.RespostaValidacao;
 
-@Controller
+@RestController
 @RequestMapping("/pedido")
 public class GeradorPedidoController {
 

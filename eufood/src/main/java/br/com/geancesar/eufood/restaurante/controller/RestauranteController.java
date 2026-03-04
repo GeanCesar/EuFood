@@ -14,13 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.geancesar.eufood.login.model.Usuario;
@@ -34,7 +35,7 @@ import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import br.com.geancesar.eufood.util.model.RespostaValidacao;
 import jakarta.servlet.http.HttpServletRequest;
 
-@Controller
+@RestController
 @RequestMapping("restaurante")
 public class RestauranteController {
 
@@ -78,6 +79,28 @@ public class RestauranteController {
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(new RespostaRequisicao(true, HttpStatus.CREATED.value(), restaurante.getUuid()));
+	}
+
+	@DeleteMapping(value = "/deletar")
+	public ResponseEntity<RespostaRequisicao> deletarRestaurante(
+			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
+
+		if (!validaTokenRestaurante(uuidRestaurante)) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
+					HttpStatus.BAD_REQUEST.value(), "Restaurante não condiz com o token informado"));
+		}
+
+		Optional<Restaurante> restaurante = repository.findById(uuidRestaurante);
+
+		if (!restaurante.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), ""));
+		}
+
+		repository.delete(restaurante.get());
+
+		return ResponseEntity.status(HttpStatus.OK).body(new RespostaRequisicao(true, HttpStatus.OK.value(), ""));
+
 	}
 
 	@GetMapping(value = "/consultar")

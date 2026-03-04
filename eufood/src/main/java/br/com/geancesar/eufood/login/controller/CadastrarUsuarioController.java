@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import br.com.geancesar.eufood.login.interceptor.CadastrarUsuarioInterceptor;
 import br.com.geancesar.eufood.login.interceptor.model.UsuarioInterceptor;
@@ -19,7 +19,7 @@ import br.com.geancesar.eufood.login.validator.CadastrarUsuarioValidator;
 import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import br.com.geancesar.eufood.util.model.RespostaValidacao;
 
-@Controller
+@RestController
 @RequestMapping("usuario")
 public class CadastrarUsuarioController {
 
