@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,6 +86,30 @@ public class CategoriaItemCardapioController {
 		repository.save(categoria);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoria.getUuid());
+	}
+
+	@PatchMapping(value = "/atualizar_ordem")
+	public ResponseEntity<String> atualizarOrdem(@RequestParam("uuid-categoria") String uuidCategoria,
+			@RequestParam("uuid-restaurante") String uuidRestaurante, @RequestParam int ordem) {
+
+		if (!validaTokenRestaurante(uuidRestaurante)) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token não condiz com o uuid de restaurante.");
+		}
+
+		Optional<Restaurante> restaurante = restauranteRepository.findById(uuidRestaurante);
+		Optional<CategoriaItemCardapio> categoria = repository.findById(uuidCategoria);
+
+		if (restaurante.isEmpty() || categoria.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Restaurante / categoria não encontrada.");
+		}
+
+		if (!restaurante.get().getUuid().equalsIgnoreCase(categoria.get().getRestaurante().getUuid())) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Restaurante / categoria não encontrada.");
+		}
+
+		categoria.get().setOrdem(ordem);
+		repository.save(categoria.get());
+		return ResponseEntity.status(HttpStatus.CREATED).body(categoria.get().getUuid());
 	}
 
 	@GetMapping(value = "/listar")
