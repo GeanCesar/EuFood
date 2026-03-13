@@ -27,6 +27,8 @@ public class ItemSubItem {
 	@ManyToOne
 	@JoinColumn(name = "uuid_categoria_subitem")
 	private CategoriaSubItem categoriaSubItem;
+	
+	private int ordem;
 
 	public String getUuid() {
 		return uuid;
@@ -58,6 +60,14 @@ public class ItemSubItem {
 
 	public void setCategoriaSubItem(CategoriaSubItem categoriaSubItem) {
 		this.categoriaSubItem = categoriaSubItem;
+	}
+	
+	public void setOrdem(int ordem) {
+		this.ordem = ordem;
+	}
+	
+	public int getOrdem() {
+		return ordem;
 	}
 
 }

@@ -4,17 +4,17 @@ import java.math.BigDecimal;
 
 import br.com.geancesar.eufood.cardapio.model.ItemCardapio;
 import br.com.geancesar.eufood.cardapio.model.TipoItem;
+import br.com.geancesar.eufood.cardapio.repository.CategoriaItemRepository;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 
 public class CadastrarItemCardapioInterceptor {
 
 	private String uuidRestaurante;
-
 	private String nome;
-
 	private BigDecimal valor;
-
 	private String descricao;
+	private String uuidCategoria;
+	private int ordem;
 
 	public String getUuidRestaurante() {
 		return uuidRestaurante;
@@ -48,13 +48,24 @@ public class CadastrarItemCardapioInterceptor {
 		this.descricao = descricao;
 	}
 
-	public ItemCardapio cadastrar(RestauranteRepository restauranteRepository, TipoItem tipo) {
+	public void setUuidCategoria(String uuidCategoria) {
+		this.uuidCategoria = uuidCategoria;
+	}
+
+	public String getUuidCategoria() {
+		return uuidCategoria;
+	}
+
+	public ItemCardapio cadastrar(RestauranteRepository restauranteRepository, TipoItem tipo,
+			CategoriaItemRepository categoriaRepository) {
 		ItemCardapio item = new ItemCardapio();
 		item.setDescricao(descricao);
 		item.setNome(nome);
 		item.setValor(valor);
 		item.setTipoItem(tipo);
 		item.setRestaurante(restauranteRepository.findById(uuidRestaurante).get());
+		item.setCategoria(categoriaRepository.findById(uuidCategoria).get());
+		item.setOrdem(ordem);
 
 		return item;
 	}

@@ -1,5 +1,7 @@
 package br.com.geancesar.eufood.cardapio.interceptor;
 
+import br.com.geancesar.eufood.cardapio.model.CategoriaSubItem;
+
 public class CadastrarCategoriaSubItemInterceptor {
 
 	private String descricao;
@@ -45,6 +47,13 @@ public class CadastrarCategoriaSubItemInterceptor {
 
 	public void setQuantidadeMaxima(int quantidadeMaxima) {
 		this.quantidadeMaxima = quantidadeMaxima;
+	}
+	
+	public void atualizaCategoria(CategoriaSubItem categoria) {
+		categoria.setDescricao(getDescricao());
+		categoria.setOrdem(getOrdem());
+		categoria.setQuantidadeMaxima(getQuantidadeMaxima());
+		categoria.setQuantidadeMinima(getQuantidadeMinima());		
 	}
 
 }

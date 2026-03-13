@@ -24,7 +24,7 @@ public class SubItemValidador {
 
 	public Object validarAssociacao(ItemCardapioRepository itemRepository,
 			CategoriaSubItemRepository categoriaSubItemRepository, String uuidCategoria, String uuidItemCardapio,
-			String uuidSubItem) {
+			String uuidSubItem, int ordem) {
 		Optional<CategoriaSubItem> categoria = categoriaSubItemRepository.findById(uuidCategoria);
 		if (categoria.isEmpty()) {
 			return "UUID da Categoria não encontrado";
@@ -41,7 +41,7 @@ public class SubItemValidador {
 		}
 		
 		CadastrarItemSubItemInterceptor interceptor = new CadastrarItemSubItemInterceptor();
-		return interceptor.associar(categoria.get(), item.get(), sub.get());
+		return interceptor.associar(categoria.get(), item.get(), sub.get(), ordem);
 	}
 
 }

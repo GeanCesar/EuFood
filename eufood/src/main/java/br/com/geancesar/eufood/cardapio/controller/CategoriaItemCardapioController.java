@@ -22,6 +22,7 @@ import br.com.geancesar.eufood.cardapio.model.CategoriaItemCardapio;
 import br.com.geancesar.eufood.cardapio.model.CategoriaSubItem;
 import br.com.geancesar.eufood.cardapio.model.CategoriaSubItemRest;
 import br.com.geancesar.eufood.cardapio.model.ItemSubItem;
+import br.com.geancesar.eufood.cardapio.model.SubItemCardapioRest;
 import br.com.geancesar.eufood.cardapio.repository.CategoriaItemRepository;
 import br.com.geancesar.eufood.cardapio.repository.ItemCardapioRepository;
 import br.com.geancesar.eufood.cardapio.repository.ItemSubItemRepository;
@@ -92,35 +93,31 @@ public class CategoriaItemCardapioController {
 	}
 
 	@GetMapping(value = "/listar")
-	public ResponseEntity<RespostaRequisicao> listarCategorias(
+	public ResponseEntity<List<CategoriaItemCardapio>> listarCategorias(
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
 		List<CategoriaItemCardapio> categorias = repository.findAllByRestauranteUuidOrderByOrdemAsc(uuidRestaurante);
 
 		if (categorias == null || categorias.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), null));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), categorias));
+		return ResponseEntity.status(HttpStatus.OK).body(categorias);
 	}
 
 	@GetMapping(value = "listar/item")
-	public ResponseEntity<RespostaRequisicao> listarSubItens(
+	public ResponseEntity<List<CategoriaSubItemRest>> listarSubItens(
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante,
 			@RequestParam(value = "uuid-item") String uuidItem) {
 
-		List<ItemSubItem> subItems = subItemRepository.findAllByItemPrincipalUuid(uuidItem);
+		List<ItemSubItem> subItems = subItemRepository.findAllByItemPrincipalUuidOrderByOrdem(uuidItem);
 
 		if (subItems == null || subItems.size() == 0) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), null));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
 		List<CategoriaSubItemRest> categorias = processaSubItems(subItems);
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), categorias));
+		return ResponseEntity.status(HttpStatus.OK).body(categorias);
 	}
 
 	private List<CategoriaSubItemRest> processaSubItems(List<ItemSubItem> subItems) {
@@ -137,10 +134,12 @@ public class CategoriaItemCardapioController {
 				cat.setQuantidadeMinima(categoria.getKey().getQuantidadeMinima());
 				cat.setUuid(categoria.getKey().getUuid());
 
+				SubItemCardapioRest subItem = SubItemCardapioRest.fromItemCardapioAndAssociacao(item.getSubItem(),
+						item);
 				if (categorias.contains(cat)) {
-					categorias.get(categorias.indexOf(cat)).getItens().add(item.getSubItem());
+					categorias.get(categorias.indexOf(cat)).getItens().add(subItem);
 				} else {
-					cat.getItens().add(item.getSubItem());
+					cat.getItens().add(subItem);
 					categorias.add(cat);
 				}
 			}

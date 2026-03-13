@@ -40,6 +40,8 @@ public class ItemCardapio {
 
 	@ManyToOne
 	private CategoriaItemCardapio categoria;
+	
+	private int ordem;
 
 	public String getUuid() {
 		return uuid;
@@ -103,6 +105,14 @@ public class ItemCardapio {
 
 	public void setTipoItem(TipoItem tipoItem) {
 		this.tipoItem = tipoItem.getDescricao();
+	}
+	
+	public int getOrdem() {
+		return ordem;
+	}
+	
+	public void setOrdem(int ordem) {
+		this.ordem = ordem;
 	}
 
 }

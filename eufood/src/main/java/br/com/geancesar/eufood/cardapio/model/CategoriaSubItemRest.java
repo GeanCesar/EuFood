@@ -10,7 +10,7 @@ public class CategoriaSubItemRest {
 	private String descricao;
 	private int quantidadeMinima;
 	private int quantidadeMaxima;
-	private List<ItemCardapio> itens = new ArrayList<>();
+	private List<SubItemCardapioRest> itens = new ArrayList<>();
 
 	public String getUuid() {
 		return uuid;
@@ -44,11 +44,11 @@ public class CategoriaSubItemRest {
 		this.quantidadeMaxima = quantidadeMaxima;
 	}
 
-	public List<ItemCardapio> getItens() {
+	public List<SubItemCardapioRest> getItens() {
 		return itens;
 	}
 
-	public void setItens(List<ItemCardapio> itens) {
+	public void setItens(List<SubItemCardapioRest> itens) {
 		this.itens = itens;
 	}
 
