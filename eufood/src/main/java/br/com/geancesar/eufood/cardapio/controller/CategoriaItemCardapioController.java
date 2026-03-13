@@ -32,7 +32,6 @@ import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.security.TokenService;
-import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import br.com.geancesar.eufood.util.model.RespostaValidacao;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -69,17 +68,14 @@ public class CategoriaItemCardapioController {
 	}
 
 	@PostMapping(value = "/cadastrar")
-	public ResponseEntity<RespostaRequisicao> cadastrarCategoria(
-			@RequestBody CadastrarCategoriaItemInterceptor interceptor) {
+	public ResponseEntity<String> cadastrarCategoria(@RequestBody CadastrarCategoriaItemInterceptor interceptor) {
 		RespostaValidacao respostaValidacao = CategoriaItemValidador.getInstance().validaDadosCadastro(interceptor);
 		if (!respostaValidacao.isOk()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-					new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), respostaValidacao.getMensagem()));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respostaValidacao.getMensagem());
 		}
 
 		if (!validaTokenRestaurante(interceptor.getUuidRestaurante())) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-					HttpStatus.BAD_REQUEST.value(), "Token não condiz com o uuid de restaurante."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token não condiz com o uuid de restaurante.");
 		}
 
 		Optional<Restaurante> restaurante = restauranteRepository.findById(interceptor.getUuidRestaurante());
@@ -88,8 +84,7 @@ public class CategoriaItemCardapioController {
 				restaurante.get());
 		repository.save(categoria);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(new RespostaRequisicao(true, HttpStatus.CREATED.value(), categoria.getUuid()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(categoria.getUuid());
 	}
 
 	@GetMapping(value = "/listar")

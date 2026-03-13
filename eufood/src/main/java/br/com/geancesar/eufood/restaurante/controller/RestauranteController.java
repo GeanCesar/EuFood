@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.geancesar.eufood.cardapio.repository.CategoriaItemRepository;
+import br.com.geancesar.eufood.cardapio.repository.ItemCardapioRepository;
 import br.com.geancesar.eufood.login.model.Usuario;
 import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
 import br.com.geancesar.eufood.restaurante.interceptor.CadastrarRestauranteInterceptor;
@@ -31,9 +33,9 @@ import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.restaurante.validator.RestauranteValidador;
 import br.com.geancesar.eufood.security.TokenService;
-import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import br.com.geancesar.eufood.util.model.RespostaValidacao;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("restaurante")
@@ -46,6 +48,12 @@ public class RestauranteController {
 
 	@Autowired
 	RestauranteRepository repository;
+	
+	@Autowired
+	ItemCardapioRepository itemRepository;
+	
+	@Autowired
+	CategoriaItemRepository categoriaItemRepository;
 
 	@Autowired
 	private HttpServletRequest request;
@@ -63,72 +71,63 @@ public class RestauranteController {
 	 * @param interceptor
 	 * @return
 	 */
-	public ResponseEntity<RespostaRequisicao> cadastrarRestaurante(
-			@RequestBody CadastrarRestauranteInterceptor interceptor) {
+	public ResponseEntity<String> cadastrarRestaurante(@RequestBody CadastrarRestauranteInterceptor interceptor) {
 
 		RespostaValidacao respotaValidacao = RestauranteValidador.getInstance().validarDadosCadastro(interceptor);
 
 		if (!respotaValidacao.isOk()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-					new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), respotaValidacao.getMensagem()));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respotaValidacao.getMensagem());
 		}
 
 		Restaurante restaurante = interceptor.cadastrar();
 		restaurante.setUsuario(getUsuarioToken());
 		repository.save(restaurante);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(new RespostaRequisicao(true, HttpStatus.CREATED.value(), restaurante.getUuid()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(restaurante.getUuid());
 	}
 
 	@DeleteMapping(value = "/deletar")
-	public ResponseEntity<RespostaRequisicao> deletarRestaurante(
-			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
+	@Transactional
+	public ResponseEntity<String> deletarRestaurante(@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
 
 		if (!validaTokenRestaurante(uuidRestaurante)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-					HttpStatus.BAD_REQUEST.value(), "Restaurante não condiz com o token informado"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Restaurante não condiz com o token informado");
 		}
 
 		Optional<Restaurante> restaurante = repository.findById(uuidRestaurante);
 
 		if (!restaurante.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), ""));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("");
 		}
 
+		categoriaItemRepository.deleteAllByRestauranteUuid(restaurante.get().getUuid());
+		itemRepository.deleteAllByRestauranteUuid(restaurante.get().getUuid());
 		repository.delete(restaurante.get());
-
-		return ResponseEntity.status(HttpStatus.OK).body(new RespostaRequisicao(true, HttpStatus.OK.value(), ""));
-
+		return ResponseEntity.status(HttpStatus.OK).body("");
 	}
 
 	@GetMapping(value = "/consultar")
-	public ResponseEntity<RespostaRequisicao> getRestaurante(
+	public ResponseEntity<Restaurante> getRestaurante(
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
 		Optional<Restaurante> restaurante = repository.findById(uuidRestaurante);
 
 		if (!restaurante.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), ""));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), restaurante.get()));
+		return ResponseEntity.status(HttpStatus.OK).body(restaurante.get());
 	}
 
 	@GetMapping(value = "/listar")
-	public ResponseEntity<RespostaRequisicao> getRestaurantes() {
+	public ResponseEntity<Iterable<Restaurante>> getRestaurantes() {
 		Iterable<Restaurante> restaurantes = repository.findAll();
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), restaurantes));
+		return ResponseEntity.status(HttpStatus.OK).body(restaurantes);
 	}
 
 	@GetMapping(value = "/listar/usuario")
-	public ResponseEntity<RespostaRequisicao> getRestaurantesPorUsuario() {
+	public ResponseEntity<Iterable<Restaurante>> getRestaurantesPorUsuario() {
 		Iterable<Restaurante> restaurantes = repository.findAllByUsuarioUuid(getUsuarioToken().getUuid());
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), restaurantes));
+		return ResponseEntity.status(HttpStatus.OK).body(restaurantes);
 	}
 
 	@GetMapping(value = "/imagem_perfil")
@@ -150,12 +149,12 @@ public class RestauranteController {
 	}
 
 	@PostMapping("/upload/imagem_perfil")
-	public ResponseEntity<RespostaRequisicao> uploadImagemPerfil(@RequestParam MultipartFile file,
+	public ResponseEntity<String> uploadImagemPerfil(@RequestParam MultipartFile file,
 			@RequestParam(required = true, value = "uuid-restaurante") String uuidRestaurante) {
 		try {
 			if (!validaTokenRestaurante(uuidRestaurante)) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-						HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body("UUID do restaurante não condiz com o token informado");
 			}
 
 			Path uploadPath = Paths.get(discoArquivos + CAMINHO_IMAGENS + uuidRestaurante);
@@ -171,63 +170,10 @@ public class RestauranteController {
 
 			repository.save(restaurante.get());
 
-			return ResponseEntity.status(HttpStatus.OK).body(new RespostaRequisicao(true, HttpStatus.OK.value(), ""));
+			return ResponseEntity.status(HttpStatus.OK).body("");
 
 		} catch (IOException | IllegalStateException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new RespostaRequisicao(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-		}
-	}
-
-	@GetMapping(value = "/imagem_capa")
-	public ResponseEntity<RespostaRequisicao> getImagemCapa(
-			@RequestParam(required = true, value = "uuid-restaurante") String uuidRestaurante) {
-		Optional<Restaurante> restaurante = repository.findById(uuidRestaurante);
-		if (restaurante.isPresent()) {
-			try {
-				File imagem = new File(
-						discoArquivos + CAMINHO_IMAGENS + uuidRestaurante + "\\" + restaurante.get().getImagemCapa());
-				InputStream stream = new FileInputStream(imagem);
-				return ResponseEntity.status(HttpStatus.OK)
-						.body(new RespostaRequisicao(true, HttpStatus.OK.value(), IOUtils.toByteArray(stream)));
-			} catch (Exception e) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), "Imagem não encontrada"));
-			}
-		}
-
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), "Restaurante não encontrado"));
-
-	}
-
-	@PostMapping("/upload/imagem_capa")
-	public ResponseEntity<RespostaRequisicao> uploadImagemCapa(@RequestParam MultipartFile file,
-			@RequestParam(required = true, value = "uuid-restaurante") String uuidRestaurante) {
-		try {
-			if (!validaTokenRestaurante(uuidRestaurante)) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-						HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
-			}
-
-			Path uploadPath = Paths.get(discoArquivos + CAMINHO_IMAGENS + uuidRestaurante);
-			if (!Files.exists(uploadPath)) {
-				Files.createDirectories(uploadPath);
-			}
-
-			Path filePath = uploadPath.resolve(file.getOriginalFilename());
-			file.transferTo(filePath.toFile());
-
-			Optional<Restaurante> restaurante = repository.findById(uuidRestaurante);
-			restaurante.get().setImagemCapa(file.getOriginalFilename());
-
-			repository.save(restaurante.get());
-
-			return ResponseEntity.status(HttpStatus.OK).body(new RespostaRequisicao(true, HttpStatus.OK.value(), ""));
-
-		} catch (IOException | IllegalStateException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new RespostaRequisicao(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 

@@ -24,7 +24,6 @@ import br.com.geancesar.eufood.pedido.repository.PedidoSubItemRepository;
 import br.com.geancesar.eufood.pedido.validator.PedidoValidador;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.security.TokenService;
-import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import br.com.geancesar.eufood.util.model.RespostaValidacao;
 
 @RestController
@@ -57,25 +56,23 @@ public class GeradorPedidoController {
 
 	@Autowired
 	ItemSubItemRepository itemSubRepository;
-	
+
 	@Autowired
 	TokenService tokenService;
 
 	@PostMapping("/criar")
-	public ResponseEntity<RespostaRequisicao> criarPedido(@RequestBody CriacaoPedidoRest pedidoRest) {
+	public ResponseEntity<String> criarPedido(@RequestBody CriacaoPedidoRest pedidoRest) {
 
 		RespostaValidacao respostaValidacao = validador.validarCriacao(pedidoRest);
 		if (!respostaValidacao.isOk()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-					new RespostaRequisicao(true, HttpStatus.BAD_REQUEST.value(), respostaValidacao.getMensagem()));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respostaValidacao.getMensagem());
 		}
 
 		Pedido pedido = pedidoRest.toPedido(restauranteRepository, usuarioRepository, itemCardapioRepository,
 				itemSubRepository, tokenService);
 		salvaPedido(pedido);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(new RespostaRequisicao(true, HttpStatus.CREATED.value(), ""));
+		return ResponseEntity.status(HttpStatus.CREATED).body("");
 
 	}
 

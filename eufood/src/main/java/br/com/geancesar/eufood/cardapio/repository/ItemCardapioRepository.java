@@ -11,5 +11,7 @@ public interface ItemCardapioRepository extends CrudRepository<ItemCardapio, Str
 	public List<ItemCardapio> findAllByRestauranteUuidAndTipoItemOrderByOrdem(String uuidRestaurante, String tipoItem);
 
 	public List<ItemCardapio> findAllByRestauranteUuidAndCategoriaUuidAndTipoItemOrderByOrdem(String uuidRestaurante, String categoria, String tipoItem);
+	
+	public void deleteAllByRestauranteUuid(String uuidRestaurante);
 
 }

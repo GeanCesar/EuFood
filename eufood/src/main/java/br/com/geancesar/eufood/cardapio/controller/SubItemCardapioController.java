@@ -42,7 +42,6 @@ import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.security.TokenService;
-import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -79,49 +78,44 @@ public class SubItemCardapioController {
 	private ItemSubItemRepository repository;
 
 	@GetMapping("/listar")
-	public ResponseEntity<RespostaRequisicao> listarItens(
+	public ResponseEntity<List<ItemCardapio>> listarItens(
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
 		List<ItemCardapio> items = itemRepository.findAllByRestauranteUuidAndTipoItemOrderByOrdem(uuidRestaurante,
 				TipoItem.SUBITEM.toString());
 
 		if (items != null && items.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), items));
+			return ResponseEntity.status(HttpStatus.OK).body(items);
 		}
 
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body(new RespostaRequisicao(true, HttpStatus.NOT_FOUND.value(), ""));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
 	@PostMapping("/cadastrar")
-	public ResponseEntity<RespostaRequisicao> cadastrarItem(
-			@RequestBody CadastrarItemCardapioInterceptor itemInterceptor) {
+	public ResponseEntity<String> cadastrarItem(@RequestBody CadastrarItemCardapioInterceptor itemInterceptor) {
 		if (!validaTokenRestaurante(itemInterceptor.getUuidRestaurante(), null, null)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-					HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("UUID do restaurante não condiz com o token informado");
 		}
 
 		ItemCardapio item = itemInterceptor.cadastrar(restauranteRepository, TipoItem.SUBITEM, categoriaRepository);
 		itemRepository.save(item);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(new RespostaRequisicao(true, HttpStatus.CREATED.value(), item.getUuid()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(item.getUuid());
 	}
 
 	@PostMapping("/upload/imagem_perfil")
-	public ResponseEntity<RespostaRequisicao> uploadImagemPerfil(@RequestParam MultipartFile file,
+	public ResponseEntity<String> uploadImagemPerfil(@RequestParam MultipartFile file,
 			@RequestParam(required = true, value = "uuid-restaurante") String uuidRestaurante,
 			@RequestParam(required = true, value = "uuid-item-cardapio") String uuidItemCardapio) {
 		try {
 			if (!validaTokenRestaurante(uuidRestaurante, uuidItemCardapio, null)) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-						HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body("UUID do restaurante não condiz com o token informado");
 			}
 
 			Optional<ItemCardapio> item = itemRepository.findById(uuidItemCardapio);
 			if (!item.get().getRestaurante().getUuid().equals(uuidRestaurante)) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-						HttpStatus.BAD_REQUEST.value(), "UUID do item não condiz com o restaurante"));
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("UUID do item não condiz com o restaurante");
 			}
 
 			Path uploadPath = Paths.get(discoArquivos + CAMINHO_IMAGENS + uuidRestaurante);
@@ -136,11 +130,10 @@ public class SubItemCardapioController {
 
 			itemRepository.save(item.get());
 
-			return ResponseEntity.status(HttpStatus.OK).body(new RespostaRequisicao(true, HttpStatus.OK.value(), ""));
+			return ResponseEntity.status(HttpStatus.OK).body("");
 
 		} catch (IOException | IllegalStateException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new RespostaRequisicao(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
@@ -174,7 +167,7 @@ public class SubItemCardapioController {
 	}
 
 	@PutMapping("/associar_sub_item")
-	public ResponseEntity<RespostaRequisicao> associarSubItem(
+	public ResponseEntity<String> associarSubItem(
 			@RequestParam(required = true, value = "uuid-sub-item") String uuidSubItem,
 			@RequestParam(required = true, value = "uuid-item-principal") String uuidItemCardapio,
 			@RequestParam(required = true, value = "uuid-categoria") String uuidCategoria,
@@ -184,59 +177,54 @@ public class SubItemCardapioController {
 				uuidCategoria, uuidItemCardapio, uuidSubItem, ordem);
 
 		if (retorno != null && retorno instanceof String) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), retorno));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.valueOf(retorno));
 		}
 
 		if (validaTokenRestaurante(uuidSubItem, uuidItemCardapio, uuidCategoria)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-					HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("UUID do restaurante não condiz com o token informado");
 		}
 
 		repository.save((ItemSubItem) retorno);
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), ((ItemSubItem) retorno).getUuid()));
+		return ResponseEntity.status(HttpStatus.OK).body(((ItemSubItem) retorno).getUuid());
 	}
 
 	@DeleteMapping("/remover_associacao")
-	public ResponseEntity<RespostaRequisicao> removerAssociacaoSubItem(
+	public ResponseEntity<String> removerAssociacaoSubItem(
 			@RequestParam(required = true, value = "uuid-associacao") String uuidAssociacao) {
 
 		Optional<ItemSubItem> itemSubItem = repository.findById(uuidAssociacao);
 
 		if (validaTokenRestaurante(itemSubItem.get().getSubItem().getUuid(),
 				itemSubItem.get().getItemPrincipal().getUuid(), itemSubItem.get().getCategoriaSubItem().getUuid())) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-					HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("UUID do restaurante não condiz com o token informado");
 		}
 
 		repository.delete(itemSubItem.get());
 
-		return ResponseEntity.status(HttpStatus.OK).body(new RespostaRequisicao(true, HttpStatus.OK.value(), ""));
+		return ResponseEntity.status(HttpStatus.OK).body("");
 	}
 
 	@PatchMapping("/atualizar_ordem")
-	public ResponseEntity<RespostaRequisicao> atualizaOrdem(
-			@RequestParam(required = true, value = "uuid-item-subitem") String uuid, @RequestParam int ordem) {
+	public ResponseEntity<String> atualizaOrdem(@RequestParam(required = true, value = "uuid-item-subitem") String uuid,
+			@RequestParam int ordem) {
 
 		Optional<ItemSubItem> itemSub = repository.findById(uuid);
 
 		if (!itemSub.isPresent()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), "Associação não encontrada"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Associação não encontrada");
 		}
 
 		if (!validaTokenRestaurante(itemSub.get().getItemPrincipal().getRestaurante().getUuid(), null, null)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-					HttpStatus.BAD_REQUEST.value(), "Token não condiz com o uuid de restaurante."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token não condiz com o uuid de restaurante.");
 		}
 
 		itemSub.get().setOrdem(ordem);
 		repository.save(itemSub.get());
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), itemSub.get()));
+		return ResponseEntity.status(HttpStatus.OK).body(itemSub.get().toString());
 
 	}
 

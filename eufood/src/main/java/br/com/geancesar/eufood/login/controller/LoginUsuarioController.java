@@ -20,7 +20,6 @@ import br.com.geancesar.eufood.login.model.Usuario;
 import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
 import br.com.geancesar.eufood.login.validator.LoginUsuarioValidator;
 import br.com.geancesar.eufood.security.TokenService;
-import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 
 @RestController
 @RequestMapping("/usuario_login")
@@ -42,7 +41,7 @@ public class LoginUsuarioController {
 	 * @param usuarioInterceptor
 	 * @return
 	 */
-	public ResponseEntity<RespostaRequisicao> login(@RequestBody UsuarioInterceptor usuarioInterceptor) {
+	public ResponseEntity<String> login(@RequestBody UsuarioInterceptor usuarioInterceptor) {
 
 		LoginUsuarioValidator validador = new LoginUsuarioValidator();
 		validador.validarDados(usuarioInterceptor);
@@ -60,14 +59,12 @@ public class LoginUsuarioController {
 			usuario.setUltimoLogin(new Date());
 			repository.save(usuario);
 
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), token));
+			return ResponseEntity.status(HttpStatus.OK).body(token);
 		} else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(new RespostaRequisicao(false, HttpStatus.UNAUTHORIZED.value()));
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("");
 		}
 	}
-	
+
 	@GetMapping("/login/valida_token")
 	/**
 	 * Valida se o token informado é valido e retorna o usuário
@@ -75,15 +72,13 @@ public class LoginUsuarioController {
 	 * @param usuarioInterceptor
 	 * @return
 	 */
-	public ResponseEntity<RespostaRequisicao> validaToken() {
-		Optional<Usuario> usuario = tokenService.getUsuario();		
-		
+	public ResponseEntity<String> validaToken() {
+		Optional<Usuario> usuario = tokenService.getUsuario();
+
 		if (usuario != null && !usuario.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), usuario.get().getNome()));
+			return ResponseEntity.status(HttpStatus.OK).body(usuario.get().getNome());
 		} else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(new RespostaRequisicao(false, HttpStatus.UNAUTHORIZED.value()));
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("");
 		}
 	}
 

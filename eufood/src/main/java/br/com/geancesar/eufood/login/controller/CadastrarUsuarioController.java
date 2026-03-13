@@ -16,7 +16,6 @@ import br.com.geancesar.eufood.login.model.Usuario;
 import br.com.geancesar.eufood.login.model.UsuarioRole;
 import br.com.geancesar.eufood.login.repository.CadastrarUsuarioRepository;
 import br.com.geancesar.eufood.login.validator.CadastrarUsuarioValidator;
-import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import br.com.geancesar.eufood.util.model.RespostaValidacao;
 
 @RestController
@@ -33,7 +32,7 @@ public class CadastrarUsuarioController {
 	 * @param usuarioInterceptor
 	 * @return
 	 */
-	public ResponseEntity<RespostaRequisicao> cadastrar(@RequestBody UsuarioInterceptor usuarioInterceptor) {
+	public ResponseEntity<String> cadastrar(@RequestBody UsuarioInterceptor usuarioInterceptor) {
 		RespostaValidacao respostaValidacao = CadastrarUsuarioValidator.getInstance()
 				.validarCadastrarUsuario(usuarioInterceptor, repository);
 		if (respostaValidacao.isOk()) {
@@ -41,12 +40,10 @@ public class CadastrarUsuarioController {
 			usuario.setRole(UsuarioRole.USUARIO.getRole());
 
 			if (repository.save(usuario) != null)
-				return ResponseEntity.status(HttpStatus.CREATED)
-						.body(new RespostaRequisicao(true, HttpStatus.CREATED.value()));
+				return ResponseEntity.status(HttpStatus.CREATED).body("");
 		}
 
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), respostaValidacao.getMensagem()));
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respostaValidacao.getMensagem());
 	}
 
 	@PostMapping("/cadastrar_usuario_restaurante")
@@ -57,8 +54,7 @@ public class CadastrarUsuarioController {
 	 * @param usuarioInterceptor
 	 * @return
 	 */
-	public ResponseEntity<RespostaRequisicao> cadastrarUsuarioRestaurante(
-			@RequestBody UsuarioInterceptor usuarioInterceptor) {
+	public ResponseEntity<String> cadastrarUsuarioRestaurante(@RequestBody UsuarioInterceptor usuarioInterceptor) {
 		RespostaValidacao respostaValidacao = CadastrarUsuarioValidator.getInstance()
 				.validarCadastrarUsuario(usuarioInterceptor, repository);
 		if (respostaValidacao.isOk()) {
@@ -66,12 +62,10 @@ public class CadastrarUsuarioController {
 			usuario.setRole(UsuarioRole.RESTAURANTE.getRole());
 
 			if (repository.save(usuario) != null)
-				return ResponseEntity.status(HttpStatus.CREATED)
-						.body(new RespostaRequisicao(true, HttpStatus.CREATED.value()));
+				return ResponseEntity.status(HttpStatus.CREATED).body("");
 		}
 
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), respostaValidacao.getMensagem()));
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respostaValidacao.getMensagem());
 	}
 
 	@PostMapping("/cadastrar/consultar_telefone")
@@ -81,21 +75,19 @@ public class CadastrarUsuarioController {
 	 * @param usuarioInterceptor
 	 * @return
 	 */
-	public ResponseEntity<RespostaRequisicao> consultarTelefone(@RequestBody UsuarioInterceptor usuarioInterceptor) {
+	public ResponseEntity<String> consultarTelefone(@RequestBody UsuarioInterceptor usuarioInterceptor) {
 		if (usuarioInterceptor.getTelefone() == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value(), "Telefone obrigatório"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Telefone obrigatório");
 		}
 		usuarioInterceptor.setTelefone(usuarioInterceptor.getTelefone().replace(" ", "").replace("-", ""));
 
 		Optional<Usuario> usuario = repository.findByTelefone(usuarioInterceptor.getTelefone());
 
 		if (!usuario.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new RespostaRequisicao(false, HttpStatus.NOT_FOUND.value()));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("");
 		}
 
-		return ResponseEntity.status(HttpStatus.OK).body(new RespostaRequisicao(true, HttpStatus.OK.value(), ""));
+		return ResponseEntity.status(HttpStatus.OK).body("");
 	}
 
 }

@@ -38,7 +38,6 @@ import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.security.TokenService;
-import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -69,18 +68,16 @@ public class ItemCardapioController {
 	private ItemCardapioRepository repository;
 
 	@GetMapping("listar")
-	public ResponseEntity<RespostaRequisicao> listarItens(
+	public ResponseEntity<List<ItemCardapio>> listarItens(
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
 		List<ItemCardapio> items = repository.findAllByRestauranteUuidAndTipoItemOrderByOrdem(uuidRestaurante,
 				TipoItem.ITEM.toString());
 
 		if (items != null && items.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), items));
+			return ResponseEntity.status(HttpStatus.OK).body(items);
 		}
 
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body(new RespostaRequisicao(true, HttpStatus.NOT_FOUND.value(), ""));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
 	@PatchMapping("atualiza_ordem")
@@ -104,128 +101,112 @@ public class ItemCardapioController {
 	}
 
 	@GetMapping("buscar")
-	public ResponseEntity<RespostaRequisicao> buscarItem(@RequestParam(value = "uuid-item") String uuidItem) {
+	public ResponseEntity<ItemCardapio> buscarItem(@RequestParam(value = "uuid-item") String uuidItem) {
 		Optional<ItemCardapio> item = repository.findById(uuidItem);
 
 		if (item != null && item.get() != null) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), item.get()));
+			return ResponseEntity.status(HttpStatus.OK).body(item.get());
 		}
 
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body(new RespostaRequisicao(true, HttpStatus.NOT_FOUND.value(), ""));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
 	@DeleteMapping("remover")
-	public ResponseEntity<RespostaRequisicao> removerItem(@RequestParam(value = "uuid-item") String uuidItem,
+	public ResponseEntity<String> removerItem(@RequestParam(value = "uuid-item") String uuidItem,
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
 
 		if (!validaTokenRestaurante(uuidRestaurante, uuidItem, null)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(true,
-					HttpStatus.BAD_REQUEST.value(), "Token não condiz com restaurante informado"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token não condiz com restaurante informado");
 		}
 
 		Optional<ItemCardapio> item = repository.findById(uuidItem);
 
 		if (item == null || !item.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new RespostaRequisicao(true, HttpStatus.NOT_FOUND.value(), ""));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("");
 		}
 
 		repository.delete(item.get());
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new RespostaRequisicao(true, HttpStatus.OK.value(), item.get()));
+		return ResponseEntity.status(HttpStatus.OK).body("");
 
 	}
 
 	@GetMapping("listar_por_categoria")
-	public ResponseEntity<RespostaRequisicao> listarItensPorCategoria(
+	public ResponseEntity<List<ItemCardapio>> listarItensPorCategoria(
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante,
 			@RequestParam(value = "uuid-categoria") String uuidCategoria) {
 		List<ItemCardapio> items = repository.findAllByRestauranteUuidAndCategoriaUuidAndTipoItemOrderByOrdem(
 				uuidRestaurante, uuidCategoria, TipoItem.ITEM.toString());
 
 		if (items != null && items.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), items));
+			return ResponseEntity.status(HttpStatus.OK).body(items);
 		}
 
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body(new RespostaRequisicao(true, HttpStatus.NOT_FOUND.value(), ""));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
 	@PostMapping("/cadastrar")
-	public ResponseEntity<RespostaRequisicao> cadastrarItem(
-			@RequestBody CadastrarItemCardapioInterceptor itemInterceptor) {
+	public ResponseEntity<String> cadastrarItem(@RequestBody CadastrarItemCardapioInterceptor itemInterceptor) {
 		if (!validaTokenRestaurante(itemInterceptor.getUuidRestaurante(), null, null)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-					HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("UUID do restaurante não condiz com o token informado");
 		}
 
 		ItemCardapio item = itemInterceptor.cadastrar(restauranteRepository, TipoItem.ITEM, categoriaRepository);
 		repository.save(item);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(new RespostaRequisicao(true, HttpStatus.CREATED.value(), item.getUuid()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(item.getUuid());
 	}
 
 	@PostMapping("/sub_item/cadastrar")
-	public ResponseEntity<RespostaRequisicao> cadastrarSubItem(
-			@RequestBody CadastrarItemCardapioInterceptor itemInterceptor) {
+	public ResponseEntity<String> cadastrarSubItem(@RequestBody CadastrarItemCardapioInterceptor itemInterceptor) {
 		if (!validaTokenRestaurante(itemInterceptor.getUuidRestaurante(), null, null)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-					HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("UUID do restaurante não condiz com o token informado");
 		}
 
 		ItemCardapio item = itemInterceptor.cadastrar(restauranteRepository, TipoItem.SUBITEM, categoriaRepository);
 		repository.save(item);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(new RespostaRequisicao(true, HttpStatus.CREATED.value(), item.getUuid()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(item.getUuid());
 	}
 
 	@PutMapping("/associar_categoria")
-	public ResponseEntity<RespostaRequisicao> associarCategoria(
-			@RequestParam(value = "uuid-categoria") String uuidCategoria,
+	public ResponseEntity<String> associarCategoria(@RequestParam(value = "uuid-categoria") String uuidCategoria,
 			@RequestParam(value = "uuid-item") String uuidItem,
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
 
 		if (!validaTokenRestaurante(uuidRestaurante, uuidItem, uuidCategoria)) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(),
-							"UUID do restaurante / item ou categoria não condiz com o token informado"));
+					.body("UUID do restaurante / item ou categoria não condiz com o token informado");
 		}
 
 		Optional<CategoriaItemCardapio> categoria = categoriaRepository.findById(uuidCategoria);
 		if (categoria == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-					new RespostaRequisicao(false, HttpStatus.BAD_REQUEST.value(), "UUID da categoria não encontrado"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("UUID da categoria não encontrado");
 		}
 
 		Optional<ItemCardapio> item = repository.findById(uuidItem);
 		item.get().setCategoria(categoria.get());
 		repository.save(item.get());
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new RespostaRequisicao(false, HttpStatus.OK.value(), "Categoria associada com sucesso"));
+		return ResponseEntity.status(HttpStatus.OK).body("Categoria associada com sucesso");
 
 	}
 
 	@PostMapping("/upload/imagem_perfil")
-	public ResponseEntity<RespostaRequisicao> uploadImagemPerfil(@RequestParam MultipartFile file,
+	public ResponseEntity<String> uploadImagemPerfil(@RequestParam MultipartFile file,
 			@RequestParam(required = true, value = "uuid-restaurante") String uuidRestaurante,
 			@RequestParam(required = true, value = "uuid-item-cardapio") String uuidItemCardapio) {
 		try {
 			if (!validaTokenRestaurante(uuidRestaurante, uuidItemCardapio, null)) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-						HttpStatus.BAD_REQUEST.value(), "UUID do restaurante não condiz com o token informado"));
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body("UUID do restaurante não condiz com o token informado");
 			}
 
 			Optional<ItemCardapio> item = repository.findById(uuidItemCardapio);
 			if (!item.get().getRestaurante().getUuid().equals(uuidRestaurante)) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RespostaRequisicao(false,
-						HttpStatus.BAD_REQUEST.value(), "UUID do item não condiz com o restaurante"));
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("UUID do item não condiz com o restaurante");
 			}
 
 			Path uploadPath = Paths.get(discoArquivos + CAMINHO_IMAGENS + uuidRestaurante);
@@ -240,11 +221,10 @@ public class ItemCardapioController {
 
 			repository.save(item.get());
 
-			return ResponseEntity.status(HttpStatus.OK).body(new RespostaRequisicao(true, HttpStatus.OK.value(), ""));
+			return ResponseEntity.status(HttpStatus.OK).body("");
 
 		} catch (IOException | IllegalStateException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new RespostaRequisicao(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 

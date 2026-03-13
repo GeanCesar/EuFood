@@ -9,5 +9,7 @@ import br.com.geancesar.eufood.cardapio.model.CategoriaItemCardapio;
 public interface CategoriaItemRepository extends CrudRepository<CategoriaItemCardapio, String> {
 
 	public List<CategoriaItemCardapio> findAllByRestauranteUuidOrderByOrdemAsc(String uuidRestaurante);
+	
+	public void deleteAllByRestauranteUuid(String uuidRestaurante);
 
 }

@@ -15,7 +15,6 @@ import br.com.geancesar.eufood.pedido.model.Pedido;
 import br.com.geancesar.eufood.pedido.model.rest.consulta.ConsultaPedidoRest;
 import br.com.geancesar.eufood.pedido.repository.PedidoRepository;
 import br.com.geancesar.eufood.security.TokenService;
-import br.com.geancesar.eufood.util.model.RespostaRequisicao;
 
 @RestController
 @RequestMapping("pedido")
@@ -35,18 +34,16 @@ public class PedidoController {
 	}
 
 	@GetMapping("/listar")
-	public ResponseEntity<RespostaRequisicao> listar() {
+	public ResponseEntity<List<ConsultaPedidoRest>> listar() {
 		String uuidUsuario = tokenService.getUuidUsuario();
 
 		List<ConsultaPedidoRest> pedidos = buscaPedidos(uuidUsuario);
 
 		if (pedidos != null && pedidos.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new RespostaRequisicao(true, HttpStatus.OK.value(), pedidos));
+			return ResponseEntity.status(HttpStatus.OK).body(pedidos);
 		}
 
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body(new RespostaRequisicao(true, HttpStatus.NOT_FOUND.value(), null));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
 	private List<ConsultaPedidoRest> buscaPedidos(String uuidUsuario) {
