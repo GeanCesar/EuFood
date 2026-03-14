@@ -117,7 +117,7 @@ public class CategoriaItemCardapioController {
 			@RequestParam(value = "uuid-restaurante") String uuidRestaurante) {
 		List<CategoriaItemCardapio> categorias = repository.findAllByRestauranteUuidOrderByOrdemAsc(uuidRestaurante);
 
-		if (categorias == null || categorias.isEmpty()) {
+		if (categorias == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
@@ -131,7 +131,7 @@ public class CategoriaItemCardapioController {
 
 		List<ItemSubItem> subItems = subItemRepository.findAllByItemPrincipalUuidOrderByOrdem(uuidItem);
 
-		if (subItems == null || subItems.size() == 0) {
+		if (subItems == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
