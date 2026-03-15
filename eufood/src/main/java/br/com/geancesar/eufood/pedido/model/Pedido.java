@@ -23,6 +23,8 @@ public class Pedido {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String uuid;
+	
+	private String numeroPedido;
 
 	@OneToMany(cascade = CascadeType.MERGE, mappedBy = "pedido")
 	private List<PedidoItem> items;
@@ -96,5 +98,13 @@ public class Pedido {
 
 	public void setDataHora(Date dataHora) {
 		this.dataHora = dataHora;
+	}
+	
+	public void setNumeroPedido(String numeroPedido) {
+		this.numeroPedido = numeroPedido;
+	}
+	
+	public String getNumeroPedido() {
+		return numeroPedido;
 	}
 }

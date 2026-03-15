@@ -9,17 +9,21 @@ import br.com.geancesar.eufood.cardapio.model.ItemCardapio;
 import br.com.geancesar.eufood.cardapio.repository.ItemCardapioRepository;
 import br.com.geancesar.eufood.pedido.model.Pedido;
 import br.com.geancesar.eufood.pedido.model.PedidoItem;
+import br.com.geancesar.eufood.pedido.model.PedidoStatus;
 import br.com.geancesar.eufood.pedido.model.PedidoSubItem;
+import br.com.geancesar.eufood.pedido.repository.PedidoStatusRepository;
 
 public class ConsultaPedidoRest {
 
 	private List<ConsultaPedidoItemRest> items;
+	private String numeroPedido;
 	private String uuidRestaurante;
 	private String uuidUsuario;
 	private String uuidPedido;
 	private BigDecimal valorTotal;
 	private BigDecimal valorFrete;
 	private Date dataCriacao;
+	private List<ConsultaPedidoStatusRest> status;
 
 	public String getUuidUsuario() {
 		return uuidUsuario;
@@ -77,11 +81,29 @@ public class ConsultaPedidoRest {
 		this.dataCriacao = dataCriacao;
 	}
 
-	public ConsultaPedidoRest fromPedido(Pedido pedido, ItemCardapioRepository itemRepository) {
+	public String getNumeroPedido() {
+		return numeroPedido;
+	}
+
+	public void setNumeroPedido(String numeroPedido) {
+		this.numeroPedido = numeroPedido;
+	}
+
+	public void setStatus(List<ConsultaPedidoStatusRest> status) {
+		this.status = status;
+	}
+
+	public List<ConsultaPedidoStatusRest> getStatus() {
+		return status;
+	}
+
+	public ConsultaPedidoRest fromPedido(Pedido pedido, ItemCardapioRepository itemRepository,
+			PedidoStatusRepository pedidoStatusRepository) {
 		ConsultaPedidoRest rest = new ConsultaPedidoRest();
 		rest.setDataCriacao(pedido.getDataHora());
 		rest.setUuidPedido(pedido.getUuid());
 		rest.setUuidUsuario(pedido.getUsuario().getUuid());
+		rest.setNumeroPedido(pedido.getNumeroPedido());
 		rest.setUuidRestaurante(pedido.getRestaurante().getUuid());
 		rest.setValorFrete(pedido.getValorFrete());
 		rest.setValorTotal(pedido.getValorTotal());
@@ -114,6 +136,16 @@ public class ConsultaPedidoRest {
 			}
 
 			rest.getItems().add(item);
+		}
+
+		List<PedidoStatus> todosStatus = pedidoStatusRepository.findAllByPedidoUuidOrderByDataHoraDesc(pedido.getUuid());
+		rest.setStatus(new ArrayList<>());
+		for (PedidoStatus status : todosStatus) {
+			ConsultaPedidoStatusRest statusRest = new ConsultaPedidoStatusRest();
+			statusRest.setDataHora(status.getDataHora());
+			statusRest.setStatus(status.getStatus());
+			statusRest.setUuid(status.getUuid());
+			rest.getStatus().add(statusRest);
 		}
 
 		return rest;

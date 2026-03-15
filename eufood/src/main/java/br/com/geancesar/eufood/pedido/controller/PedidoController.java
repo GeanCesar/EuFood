@@ -19,6 +19,7 @@ import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
 import br.com.geancesar.eufood.pedido.model.Pedido;
 import br.com.geancesar.eufood.pedido.model.rest.consulta.ConsultaPedidoRest;
 import br.com.geancesar.eufood.pedido.repository.PedidoRepository;
+import br.com.geancesar.eufood.pedido.repository.PedidoStatusRepository;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.security.TokenService;
@@ -36,7 +37,10 @@ public class PedidoController {
 	PedidoRepository repository;
 
 	@Autowired
-	RestauranteRepository restauranteRepository;
+	RestauranteRepository restauranteRepository;	
+
+	@Autowired
+	PedidoStatusRepository pedidoStatusRepository;
 
 	@Autowired
 	private TokenService tokenService;
@@ -98,7 +102,7 @@ public class PedidoController {
 		if (pedidos != null) {
 			for (Pedido pedido : pedidos) {
 				ConsultaPedidoRest p = new ConsultaPedidoRest();
-				pedidosRest.add(p.fromPedido(pedido, itemCardapioRepository));
+				pedidosRest.add(p.fromPedido(pedido, itemCardapioRepository, pedidoStatusRepository));
 			}
 		}
 

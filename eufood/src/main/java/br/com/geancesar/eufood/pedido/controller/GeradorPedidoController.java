@@ -69,7 +69,7 @@ public class GeradorPedidoController {
 		}
 
 		Pedido pedido = pedidoRest.toPedido(restauranteRepository, usuarioRepository, itemCardapioRepository,
-				itemSubRepository, tokenService);
+				itemSubRepository, repository, tokenService);
 		salvaPedido(pedido);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body("");
@@ -81,7 +81,7 @@ public class GeradorPedidoController {
 
 		PedidoStatus status = new PedidoStatus();
 		status.setDataHora(pedido.getDataHora());
-		status.setStatus(Status.AGUARDANDO_PAGAMENTO.toString());
+		status.setStatus(Status.CRIADO.toString());
 		status.setPedido(pedido);
 		pedidoStatusRepository.save(status);
 

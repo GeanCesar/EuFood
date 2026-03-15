@@ -2,9 +2,11 @@ package br.com.geancesar.eufood.pedido.model.rest.criacao;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import br.com.geancesar.eufood.cardapio.model.ItemCardapio;
 import br.com.geancesar.eufood.cardapio.model.ItemSubItem;
@@ -15,6 +17,7 @@ import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
 import br.com.geancesar.eufood.pedido.model.Pedido;
 import br.com.geancesar.eufood.pedido.model.PedidoItem;
 import br.com.geancesar.eufood.pedido.model.PedidoSubItem;
+import br.com.geancesar.eufood.pedido.repository.PedidoRepository;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
 import br.com.geancesar.eufood.security.TokenService;
@@ -42,7 +45,7 @@ public class CriacaoPedidoRest {
 	}
 
 	public Pedido toPedido(RestauranteRepository restauranteRepository, LoginUsuarioRepository usuarioRepository,
-			ItemCardapioRepository itemRepository, ItemSubItemRepository itemSubRepository, TokenService tokenService) {
+			ItemCardapioRepository itemRepository, ItemSubItemRepository itemSubRepository, PedidoRepository repository, TokenService tokenService) {
 		Optional<Usuario> usuario = usuarioRepository.findById(tokenService.getUuidUsuario());
 		Optional<Restaurante> restaurante = restauranteRepository.findById(getUuidRestaurante());
 
@@ -93,8 +96,31 @@ public class CriacaoPedidoRest {
 		// TODO Tornar o frete dinamico
 		pedido.setValorFrete(BigDecimal.valueOf(4.99));
 		pedido.setValorTotal(valorTotal.add(pedido.getValorFrete()));
+		pedido.setNumeroPedido(geraNumeroPedido(repository));
 
 		return pedido;
+	}
+
+	/**
+	 * Gera o numero de pedido. O numero do pedido não pode se repetir durante um dia 
+	 * @param repository
+	 * @return
+	 */
+	private String geraNumeroPedido(PedidoRepository repository) {
+		Calendar hoje = Calendar.getInstance();
+		hoje.set(Calendar.HOUR, 0);
+		hoje.set(Calendar.MINUTE, 0);
+		hoje.set(Calendar.SECOND, 0);
+		hoje.set(Calendar.MILLISECOND, 0);
+		
+		Random rand = new Random();		
+		int numero = rand.nextInt(1001); 
+		String numeroPedido = String.format("%04d", numero);		
+		
+		if(repository.existsByNumeroPedidoAndDataHoraAfter(numeroPedido, hoje.getTime())) {
+			return geraNumeroPedido(repository);
+		}
+		return numeroPedido;
 	}
 
 }
