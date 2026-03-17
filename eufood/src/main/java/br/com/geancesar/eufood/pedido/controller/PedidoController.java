@@ -1,9 +1,11 @@
 package br.com.geancesar.eufood.pedido.controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,7 +57,7 @@ public class PedidoController {
 
 	@Autowired
 	private LoginUsuarioRepository usuarioRepository;
-	
+
 	@Autowired
 	private ControlePedidoService controlePedidoService;
 
@@ -112,8 +114,8 @@ public class PedidoController {
 		if (pedido.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum pedido encontrado");
 		}
-		
-		if(podeAtualizarStatus(pedido.get(), novoStatus)) {
+
+		if (podeAtualizarStatus(pedido.get(), novoStatus)) {
 			criaStatus(novoStatus, pedido.get());
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Status inválido");
@@ -126,29 +128,29 @@ public class PedidoController {
 	private boolean podeAtualizarStatus(Pedido pedido, Status novoStatus) {
 		ConsultaPedidoRest p = new ConsultaPedidoRest();
 		p = p.fromPedido(pedido, itemCardapioRepository, pedidoStatusRepository);
-		
+
 		ConsultaPedidoStatusRest ultimoStatus = p.getStatus().get(0);
-		switch(ultimoStatus.getStatus()) {
-			case "CANCELADO": 
-				return false;
-			case "CRIADO":
-				if(novoStatus == Status.CONFIRMADO)
-					return true;
-				break;
-			case "CONFIRMADO":
-				if(novoStatus == Status.DESPACHADO)
-					return true;
-				break;
-			case "CONCLUIDO":
-				return false;
-			default:
-				break;
+		switch (ultimoStatus.getStatus()) {
+		case "CANCELADO":
+			return false;
+		case "CRIADO":
+			if (novoStatus == Status.CONFIRMADO)
+				return true;
+			break;
+		case "CONFIRMADO":
+			if (novoStatus == Status.DESPACHADO)
+				return true;
+			break;
+		case "CONCLUIDO":
+			return false;
+		default:
+			break;
 		}
-		
-		if(novoStatus == Status.CANCELADO) {
+
+		if (novoStatus == Status.CANCELADO) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -168,7 +170,8 @@ public class PedidoController {
 		if (uuidUsuario != null) {
 			pedidos = repository.findAllByUsuarioUuidOrderByDataHoraDesc(uuidUsuario);
 		} else if (uuidRestaurante != null) {
-			pedidos = repository.findAllByRestauranteUuidAndDataHoraAfterOrderByDataHoraDesc(uuidRestaurante, dataInicio);
+			pedidos = repository.findAllByRestauranteUuidAndDataHoraAfterOrderByDataHoraDesc(uuidRestaurante,
+					dataInicio);
 		}
 
 		if (pedidos != null) {
@@ -178,7 +181,16 @@ public class PedidoController {
 			}
 		}
 
-		return pedidosRest;
+		// Ordena lista com base no Status
+		return pedidosRest.stream().sorted(new Comparator<ConsultaPedidoRest>() {
+			@Override
+			public int compare(ConsultaPedidoRest o1, ConsultaPedidoRest o2) {
+				return Status.valueOf(o1.getStatus().get(0).getStatus()).getOrdem() < Status
+						.valueOf(o2.getStatus().get(0).getStatus()).getOrdem() ? -1
+								: Status.valueOf(o1.getStatus().get(0).getStatus()).getOrdem() == Status
+										.valueOf(o2.getStatus().get(0).getStatus()).getOrdem() ? 0 : 1;
+			}
+		}).collect(Collectors.toList());
 	}
 
 	private boolean validaTokenRestaurante(String uuidRestaurante) {
