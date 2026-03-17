@@ -28,6 +28,8 @@ import br.com.geancesar.eufood.cardapio.repository.CategoriaItemRepository;
 import br.com.geancesar.eufood.cardapio.repository.ItemCardapioRepository;
 import br.com.geancesar.eufood.login.model.Usuario;
 import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
+import br.com.geancesar.eufood.pedido.model.ControlePedidosRestaurante;
+import br.com.geancesar.eufood.pedido.repository.ControlePedidosRestauranteRepository;
 import br.com.geancesar.eufood.restaurante.interceptor.CadastrarRestauranteInterceptor;
 import br.com.geancesar.eufood.restaurante.model.Restaurante;
 import br.com.geancesar.eufood.restaurante.repository.RestauranteRepository;
@@ -54,6 +56,9 @@ public class RestauranteController {
 	
 	@Autowired
 	CategoriaItemRepository categoriaItemRepository;
+	
+	@Autowired
+	ControlePedidosRestauranteRepository controlePedidosRepository;
 
 	@Autowired
 	private HttpServletRequest request;
@@ -82,6 +87,8 @@ public class RestauranteController {
 		Restaurante restaurante = interceptor.cadastrar();
 		restaurante.setUsuario(getUsuarioToken());
 		repository.save(restaurante);
+		
+		controlePedidosRepository.save(new ControlePedidosRestaurante(restaurante));
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(restaurante.getUuid());
 	}

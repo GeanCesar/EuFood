@@ -5,6 +5,7 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.geancesar.eufood.login.model.Usuario;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,6 +34,9 @@ public class Restaurante implements Serializable {
 	private String imagemPerfil;
 
 	private String imagemCapa;
+	
+	@Column(columnDefinition = "int default 60")
+	private int minutosConfirmacaoPedido;
 
 	public String getUuid() {
 		return uuid;
@@ -80,6 +84,14 @@ public class Restaurante implements Serializable {
 
 	public void setImagemCapa(String imagemCapa) {
 		this.imagemCapa = imagemCapa;
+	}
+	
+	public int getMinutosConfirmacaoPedido() {
+		return minutosConfirmacaoPedido;
+	}
+	
+	public void setMinutosConfirmacaoPedido(int minutosConfirmacaoPedido) {
+		this.minutosConfirmacaoPedido = minutosConfirmacaoPedido;
 	}
 
 }

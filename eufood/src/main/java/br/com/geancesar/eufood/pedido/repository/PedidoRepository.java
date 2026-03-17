@@ -11,7 +11,7 @@ public interface PedidoRepository extends CrudRepository<Pedido, String> {
 
 	List<Pedido> findAllByUsuarioUuidOrderByDataHoraDesc(String uuid);
 	
-	List<Pedido> findAllByRestauranteUuidAndDataHoraAfter(String uuidRestaurante, Date dataInicio);
+	List<Pedido> findAllByRestauranteUuidAndDataHoraAfterOrderByDataHoraDesc(String uuidRestaurante, Date dataInicio);
 	
 	boolean existsByNumeroPedidoAndDataHoraAfter(String numeroPedido, Date data);
 

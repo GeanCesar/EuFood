@@ -5,6 +5,7 @@ import br.com.geancesar.eufood.restaurante.model.Restaurante;
 public class CadastrarRestauranteInterceptor {
 
 	private String nome;
+	private int minutosConfirmacaoPedido = 60;
 
 	public String getNome() {
 		return nome;
@@ -17,6 +18,7 @@ public class CadastrarRestauranteInterceptor {
 	public Restaurante cadastrar() {
 		Restaurante restaurante = new Restaurante();
 		restaurante.setNome(nome);
+		restaurante.setMinutosConfirmacaoPedido(minutosConfirmacaoPedido);
 		return restaurante;
 	}
 

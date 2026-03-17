@@ -1,5 +1,7 @@
 package br.com.geancesar.eufood.pedido.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.geancesar.eufood.cardapio.repository.ItemCardapioRepository;
 import br.com.geancesar.eufood.cardapio.repository.ItemSubItemRepository;
 import br.com.geancesar.eufood.login.repository.LoginUsuarioRepository;
+import br.com.geancesar.eufood.pedido.model.ControlePedidosRestaurante;
 import br.com.geancesar.eufood.pedido.model.Pedido;
 import br.com.geancesar.eufood.pedido.model.PedidoItem;
 import br.com.geancesar.eufood.pedido.model.PedidoStatus;
 import br.com.geancesar.eufood.pedido.model.PedidoSubItem;
 import br.com.geancesar.eufood.pedido.model.Status;
 import br.com.geancesar.eufood.pedido.model.rest.criacao.CriacaoPedidoRest;
+import br.com.geancesar.eufood.pedido.repository.ControlePedidosRestauranteRepository;
 import br.com.geancesar.eufood.pedido.repository.PedidoItemRepository;
 import br.com.geancesar.eufood.pedido.repository.PedidoRepository;
 import br.com.geancesar.eufood.pedido.repository.PedidoStatusRepository;
@@ -58,6 +62,9 @@ public class GeradorPedidoController {
 	ItemSubItemRepository itemSubRepository;
 
 	@Autowired
+	ControlePedidosRestauranteRepository controlePedidosRepository;
+
+	@Autowired
 	TokenService tokenService;
 
 	@PostMapping("/criar")
@@ -94,6 +101,11 @@ public class GeradorPedidoController {
 				}
 			}
 		}
+
+		Optional<ControlePedidosRestaurante> controle = controlePedidosRepository
+				.findByRestauranteUuid(pedido.getRestaurante().getUuid());
+		controle.get().setPossuiNovoPedido(true);
+		controlePedidosRepository.save(controle.get());
 
 		return true;
 	}
