@@ -11,10 +11,10 @@ public interface PedidoStatusRepository extends CrudRepository<PedidoStatus, Str
 
 	public List<PedidoStatus> findAllByPedidoUuidOrderByDataHoraDesc(String uuid);
 
-	@Query(value = "SELECT s.* from tb_pedido_status s	INNER JOIN tb_pedido p ON p.uuid = s.uuid_pedido WHERE status = 'DESPACHADO'    AND p.uuid_restaurante = ?1 AND NOT EXISTS(SELECT * from tb_pedido_status WHERE status = 'CONCLUIDO' AND p.uuid_restaurante = ?1)", nativeQuery = true)
+	@Query(value = "SELECT s.* from tb_pedido_status s	LEFT JOIN tb_pedido p ON p.uuid = s.uuid_pedido    LEFT OUTER JOIN (SELECT s2.* from tb_pedido_status s2 LEFT JOIN tb_pedido p2 ON p2.uuid = s2.uuid_pedido where s2.status = 'CONCLUIDO' AND p2.uuid_restaurante = ?1)    s2 ON s2.uuid_pedido = s.uuid_pedido    where s.status = 'DESPACHADO' AND p.uuid_restaurante = ?1 AND s2.uuid is null", nativeQuery = true)
 	List<PedidoStatus> findPedidosSemConclusao(String uuidRestaurante);
 	
-	@Query(value = "SELECT s.* from tb_pedido_status s	LEFT JOIN tb_pedido p ON p.uuid = s.uuid_pedido LEFT OUTER JOIN (SELECT s2.* from tb_pedido_status s2 LEFT JOIN tb_pedido p2 ON p2.uuid = s2.uuid_pedido where s2.status = 'CONFIRMADO' AND p2.uuid_restaurante = ?1) s2 ON s2.uuid_pedido = s.uuid_pedido    where s.status = 'CRIADO' AND p.uuid_restaurante = ?1 AND s2.uuid is null", nativeQuery = true)
+	@Query(value = "SELECT s.* from tb_pedido_status s	LEFT JOIN tb_pedido p ON p.uuid = s.uuid_pedido LEFT OUTER JOIN (SELECT s2.* from tb_pedido_status s2 LEFT JOIN tb_pedido p2 ON p2.uuid = s2.uuid_pedido where (s2.status = 'CONFIRMADO' OR s2.status = 'CANCELADO') AND p2.uuid_restaurante = ?1) s2 ON s2.uuid_pedido = s.uuid_pedido    where s.status = 'CRIADO' AND p.uuid_restaurante = ?1 AND s2.uuid is null", nativeQuery = true)
 	List<PedidoStatus> findPedidosSemConfirmacao(String uuidRestaurante);
 
 }

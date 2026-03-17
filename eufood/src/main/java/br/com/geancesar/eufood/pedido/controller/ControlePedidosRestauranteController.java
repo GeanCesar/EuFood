@@ -58,6 +58,7 @@ public class ControlePedidosRestauranteController {
 		}
 
 		controlePedidoService.atualizaStatusPedidoConcluido(restaurante.get());
+		controlePedidoService.atualizaControle(uuidRestaurante);
 
 		ConsultaControlePedidoRest rest = ConsultaControlePedidoRest.fromControlePedido(controle.get());
 		return ResponseEntity.status(HttpStatus.OK).body(rest);
