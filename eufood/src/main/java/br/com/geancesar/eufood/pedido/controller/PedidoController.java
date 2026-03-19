@@ -181,16 +181,27 @@ public class PedidoController {
 			}
 		}
 
-		// Ordena lista com base no Status
-		return pedidosRest.stream().sorted(new Comparator<ConsultaPedidoRest>() {
-			@Override
-			public int compare(ConsultaPedidoRest o1, ConsultaPedidoRest o2) {
-				return Status.valueOf(o1.getStatus().get(0).getStatus()).getOrdem() < Status
-						.valueOf(o2.getStatus().get(0).getStatus()).getOrdem() ? -1
-								: Status.valueOf(o1.getStatus().get(0).getStatus()).getOrdem() == Status
-										.valueOf(o2.getStatus().get(0).getStatus()).getOrdem() ? 0 : 1;
-			}
-		}).collect(Collectors.toList());
+		if(uuidUsuario == null) {
+			// Ordena lista com base no Status
+			return pedidosRest.stream().sorted(new Comparator<ConsultaPedidoRest>() {
+				@Override
+				public int compare(ConsultaPedidoRest o1, ConsultaPedidoRest o2) {
+					return Status.valueOf(o1.getStatus().get(0).getStatus()).getOrdem() < Status
+							.valueOf(o2.getStatus().get(0).getStatus()).getOrdem() ? -1
+									: Status.valueOf(o1.getStatus().get(0).getStatus()).getOrdem() == Status
+											.valueOf(o2.getStatus().get(0).getStatus()).getOrdem() ? 0 : 1;
+				}
+			}).collect(Collectors.toList());
+		} else {
+			// Ordena lista com base na data / hora
+			return pedidosRest.stream().sorted(new Comparator<ConsultaPedidoRest>() {
+				@Override
+				public int compare(ConsultaPedidoRest o1, ConsultaPedidoRest o2) {
+					return o2.getDataCriacao().compareTo(o1.getDataCriacao());
+				}
+			}).collect(Collectors.toList());
+		}
+		
 	}
 
 	private boolean validaTokenRestaurante(String uuidRestaurante) {

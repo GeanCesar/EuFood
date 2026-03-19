@@ -107,6 +107,7 @@ public class RestauranteController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("");
 		}
 
+		controlePedidosRepository.deleteAllByRestauranteUuid(restaurante.get().getUuid());
 		categoriaItemRepository.deleteAllByRestauranteUuid(restaurante.get().getUuid());
 		itemRepository.deleteAllByRestauranteUuid(restaurante.get().getUuid());
 		repository.delete(restaurante.get());
